@@ -1,6 +1,7 @@
 #ifndef _RECURRENT_NETWORK
 #define _RECURRENT_NETWORK
 
+#include <iostream>
 #include <vector>
 #include "../Core/Activation.h"
 #include "../Core/ConnectNodes.h"

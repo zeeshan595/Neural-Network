@@ -1,6 +1,7 @@
 #ifndef _CONVOLUTIONAL_NETWORK_2D
 #define _CONVOLUTIONAL_NETWORK_2D
 
+#include <iostream>
 #include <vector>
 #include "../Core/Activation.h"
 #include "../Core/CommonFunctions.h"

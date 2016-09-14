@@ -4,7 +4,7 @@ BUILD_DIR 	= Build/
 COMPILER 	= g++
 CFLAGS 		= -c -Wall
 LFLAGS 		= -Wall
-OBJS		= $(BUILD_DIR)Testing.so $(BUILD_DIR)ParticleSwarmOptimisation.so $(BUILD_DIR)ConnectNodes.so $(BUILD_DIR)LinearNetwork.so $(BUILD_DIR)RecurrentNetwork.so $(BUILD_DIR)ConvolutionalNetwork.so $(BUILD_DIR)ConvolutionalNetwork2D.so $(BUILD_DIR)Activation.so $(BUILD_DIR)CommonFunctions.so
+OBJS		= $(BUILD_DIR)Testing.so $(BUILD_DIR)ParticleSwarmOptimisation.so $(BUILD_DIR)GeneticAlgorithm.so $(BUILD_DIR)ConnectNodes.so $(BUILD_DIR)LinearNetwork.so $(BUILD_DIR)RecurrentNetwork.so $(BUILD_DIR)ConvolutionalNetwork.so $(BUILD_DIR)ConvolutionalNetwork2D.so $(BUILD_DIR)Activation.so $(BUILD_DIR)CommonFunctions.so
 
 all : $(OBJS)
 		$(COMPILER) $(LFLAGS) $(OBJS) -o $(BUILD_DIR)$(EXE_NAME)
@@ -30,6 +30,9 @@ $(BUILD_DIR)RecurrentNetwork.so : Structure/RecurrentNetwork.cpp Structure/Recur
 
 $(BUILD_DIR)ParticleSwarmOptimisation.so : Learning/ParticleSwarmOptimisation.cpp Learning/ParticleSwarmOptimisation.h
 		$(COMPILER) $(CFLAGS) Learning/ParticleSwarmOptimisation.cpp -o $(BUILD_DIR)ParticleSwarmOptimisation.so
+
+$(BUILD_DIR)GeneticAlgorithm.so : Learning/GeneticAlgorithm.cpp Learning/GeneticAlgorithm.h
+		$(COMPILER) $(CFLAGS) Learning/GeneticAlgorithm.cpp -o $(BUILD_DIR)GeneticAlgorithm.so
 
 #Core
 

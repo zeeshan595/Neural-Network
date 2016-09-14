@@ -3,6 +3,7 @@
 #include "Structure/ConvolutionalNetwork2D.h"
 #include "Structure/RecurrentNetwork.h"
 #include "Learning/ParticleSwarmOptimisation.h"
+#include "Learning/GeneticAlgorithm.h"
 #include "Core/IrisDataSet.h"
 #include <vector>
 #include <string>
@@ -59,9 +60,8 @@ int main()
 
 	std::cout << "\033[1;34m[OK]\033[0m\n";
 
-	std::cout << "Particle Swarm Optimisation Using Linear Network Structure" << std::endl;
 
-	ParticleSwarmOptimisation pso(meanSquaredError, network.GetWeights());
+	//Create trainning data
 	std::vector<std::vector<double> > trainData;
 	trainData.resize(150);
 	for (int i = 0; i < 150; i++)
@@ -72,16 +72,44 @@ int main()
 			trainData[i][j] = dataset[i][j];
 		}
 	}
-	network.SetWeights(pso.Train(trainData, 20, 0.01, 0.005, 500));
-	std::cout << "Done Trainning, Now Testing With 5.0,3.0,1.6,0.2" << std::endl;
-	std::cout << "Expected Output 1, 0, 0" << std::endl;
 	std::vector<double> input;
 	input.resize(4);
+	std::vector<double> output;
+
+	std::cout << "Genetic Algorithm Using Linear Network Structure" << std::endl;
+	GeneticAlgorithm ga(meanSquaredError, network.GetWeights());
+	std::cout << "Genetic Algorithm Class Created" << std::endl;
+	network.SetWeights(ga.Train(trainData, 1000, 12, 5));
+	std::cout << "Done Trainning, Now Testing With 5.0,3.0,1.6,0.2" << std::endl;
+	std::cout << "Expected Output 1, 0, 0" << std::endl;
 	input[0] = 5.0;
 	input[1] = 3.0;
 	input[2] = 1.6;
 	input[3] = 0.2;
-	std::vector<double> output = network.Compute(input);
+	output = network.Compute(input);
+
+	std::cout << "\nOUTPUT: " << std::endl;
+	for (unsigned int i = 0; i < output.size(); i++)
+	{
+		std::cout << output[i] << ", ";
+	}
+
+	std::cout << "\n\033[1;34m[OK]\033[0m\n";
+
+	//Reset network's weights
+	network.GenerateWeights();
+
+	std::cout << "Particle Swarm Optimisation Using Linear Network Structure" << std::endl;
+
+	ParticleSwarmOptimisation pso(meanSquaredError, network.GetWeights());
+	network.SetWeights(pso.Train(trainData, 12, 0.01, 0.005, 1000));
+	std::cout << "Done Trainning, Now Testing With 5.0,3.0,1.6,0.2" << std::endl;
+	std::cout << "Expected Output 1, 0, 0" << std::endl;
+	input[0] = 5.0;
+	input[1] = 3.0;
+	input[2] = 1.6;
+	input[3] = 0.2;
+	output = network.Compute(input);
 
 	std::cout << "\nOUTPUT: " << std::endl;
 	for (unsigned int i = 0; i < output.size(); i++)

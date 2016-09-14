@@ -19,7 +19,6 @@ namespace Learning
 		double cognitiveWeight;
 		double socialWeight;		
 	
-		std::vector<double> weights;
 		double (*meanSquaredError)(std::vector<std::vector<double> > data, std::vector<double> weights);
 		ParticleSwarmOptimisation(double (*meanSquaredError)(std::vector<std::vector<double> > data, std::vector<double> weights), std::vector<double> weights);
 		~ParticleSwarmOptimisation();
@@ -27,6 +26,7 @@ namespace Learning
 		std::vector<double> Train(std::vector<std::vector<double> > trainData, int particles, double exitError, double deathProbability, int repeat);
 	private:
 		std::vector<int> Shuffle(std::vector<int> sequence);
+		std::vector<double> weights;
 
 		class Particle
 		{
