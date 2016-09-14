@@ -4,7 +4,7 @@ BUILD_DIR 	= Build/
 COMPILER 	= g++
 CFLAGS 		= -c -Wall
 LFLAGS 		= -Wall
-OBJS		= $(BUILD_DIR)Testing.so $(BUILD_DIR)ParticleSwarmOptimisation.so $(BUILD_DIR)ConnectNodes.so $(BUILD_DIR)LinearNetwork.so $(BUILD_DIR)ConvolutionalNetwork.so $(BUILD_DIR)Activation.so $(BUILD_DIR)CommonFunctions.so
+OBJS		= $(BUILD_DIR)Testing.so $(BUILD_DIR)ParticleSwarmOptimisation.so $(BUILD_DIR)ConnectNodes.so $(BUILD_DIR)LinearNetwork.so $(BUILD_DIR)RecurrentNetwork.so $(BUILD_DIR)ConvolutionalNetwork.so $(BUILD_DIR)ConvolutionalNetwork2D.so $(BUILD_DIR)Activation.so $(BUILD_DIR)CommonFunctions.so
 
 all : $(OBJS)
 		$(COMPILER) $(LFLAGS) $(OBJS) -o $(BUILD_DIR)$(EXE_NAME)
@@ -19,6 +19,12 @@ $(BUILD_DIR)LinearNetwork.so : Structure/LinearNetwork.cpp Structure/LinearNetwo
 
 $(BUILD_DIR)ConvolutionalNetwork.so : Structure/ConvolutionalNetwork.cpp Structure/ConvolutionalNetwork.h
 		$(COMPILER) $(CFLAGS) Structure/ConvolutionalNetwork.cpp -o $(BUILD_DIR)ConvolutionalNetwork.so
+
+$(BUILD_DIR)ConvolutionalNetwork2D.so : Structure/ConvolutionalNetwork2D.cpp Structure/ConvolutionalNetwork2D.h
+		$(COMPILER) $(CFLAGS) Structure/ConvolutionalNetwork2D.cpp -o $(BUILD_DIR)ConvolutionalNetwork2D.so
+
+$(BUILD_DIR)RecurrentNetwork.so : Structure/RecurrentNetwork.cpp Structure/RecurrentNetwork.h
+		$(COMPILER) $(CFLAGS) Structure/RecurrentNetwork.cpp -o $(BUILD_DIR)RecurrentNetwork.so
 
 #Learning
 

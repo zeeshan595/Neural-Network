@@ -1,5 +1,7 @@
 #include "Structure/LinearNetwork.h"
 #include "Structure/ConvolutionalNetwork.h"
+#include "Structure/ConvolutionalNetwork2D.h"
+#include "Structure/RecurrentNetwork.h"
 #include "Learning/ParticleSwarmOptimisation.h"
 #include "Core/IrisDataSet.h"
 #include <vector>
@@ -41,12 +43,21 @@ int main()
 {
 	std::cout << "STARTING LIBRARY TESTING\n\n";
 
-	std::cout << "Convolutional Network" << std::endl;
+	std::cout << "Recurrent Network ";
+
+	RecurrentNetwork recNet(4, 7, 3, 5, LOGISTIC_SIGMOID, SOFTMAX, CONNECT_ALL);
+
+	std::cout << "\033[1;34m[OK]\033[0m\n";
+	std::cout << "Convolutional Network ";
 
 	ConvolutionalNetwork convNet(4, 7, 3, 5, LOGISTIC_SIGMOID, SOFTMAX, CONNECT_ALL);
 
-	std::cout << "\033[1;35m[OK]\033[0m\n";
-	std::cout << "" << std::endl;
+	std::cout << "\033[1;34m[OK]\033[0m\n";
+	std::cout << "Convolutional Network 2D ";
+
+	ConvolutionalNetwork2D convNet2D(4, 7, 3, 5, 6, LOGISTIC_SIGMOID, SOFTMAX, CONNECT_ALL);
+
+	std::cout << "\033[1;34m[OK]\033[0m\n";
 
 	std::cout << "Particle Swarm Optimisation Using Linear Network Structure" << std::endl;
 
@@ -78,7 +89,7 @@ int main()
 		std::cout << output[i] << ", ";
 	}
 
-	std::cout << "\n\033[1;35m[OK]\033[0m\n";
+	std::cout << "\n\033[1;34m[OK]\033[0m\n";
 
 	std::cout << std::endl;
 	return 0;

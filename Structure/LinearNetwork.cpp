@@ -236,7 +236,7 @@ int LinearNetwork::GetOutput()
 {
 	return output;
 }
-std::vector<double> LinearNetwork::gethiddenOutputs()
+std::vector<double> LinearNetwork::GethiddenOutputs()
 {
 	return hOutputs;
 }

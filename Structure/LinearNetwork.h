@@ -20,7 +20,7 @@ namespace Structure
 		int WeightsLength();
 		int GetInput();
 		int GetOutput();
-		std::vector<double> gethiddenOutputs();
+		std::vector<double> GethiddenOutputs();
 		LinearNetwork(int input, int hidden, int output, ActivationType hiddenType, ActivationType outputType, ConnectionType connections);
 		~LinearNetwork();
 		std::vector<double> Compute(std::vector<double> input);
