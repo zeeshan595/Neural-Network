@@ -1,4 +1,5 @@
 #include "Structure/LinearNetwork.h"
+#include "Structure/ConvolutionalNetwork.h"
 #include "Learning/ParticleSwarmOptimisation.h"
 #include "Core/IrisDataSet.h"
 #include <vector>
@@ -7,6 +8,7 @@
 #include <streambuf>
 #include <cstring>
 #include <sstream>
+#include <stdlib.h>
 
 using namespace Core;
 using namespace Structure;
@@ -37,8 +39,18 @@ double meanSquaredError(std::vector<std::vector<double> > data, std::vector<doub
 
 int main()
 {
-	ParticleSwarmOptimisation pso(meanSquaredError, network.GetWeights());
+	std::cout << "STARTING LIBRARY TESTING\n\n";
 
+	std::cout << "Convolutional Network" << std::endl;
+
+	ConvolutionalNetwork convNet(4, 7, 3, 5, LOGISTIC_SIGMOID, SOFTMAX, CONNECT_ALL);
+
+	std::cout << "\033[1;35m[OK]\033[0m\n";
+	std::cout << "" << std::endl;
+
+	std::cout << "Particle Swarm Optimisation Using Linear Network Structure" << std::endl;
+
+	ParticleSwarmOptimisation pso(meanSquaredError, network.GetWeights());
 	std::vector<std::vector<double> > trainData;
 	trainData.resize(150);
 	for (int i = 0; i < 150; i++)
@@ -49,25 +61,24 @@ int main()
 			trainData[i][j] = dataset[i][j];
 		}
 	}
-	pso.Train(trainData, 20, 0.01, 0.005, 500);
+	network.SetWeights(pso.Train(trainData, 20, 0.01, 0.005, 500));
 	std::cout << "Done Trainning, Now Testing With 5.0,3.0,1.6,0.2" << std::endl;
 	std::cout << "Expected Output 1, 0, 0" << std::endl;
-
 	std::vector<double> input;
 	input.resize(4);
 	input[0] = 5.0;
 	input[1] = 3.0;
 	input[2] = 1.6;
 	input[3] = 0.2;
-
 	std::vector<double> output = network.Compute(input);
 
-
-	std::cout << "\n\nOUTPUT: " << std::endl;
+	std::cout << "\nOUTPUT: " << std::endl;
 	for (unsigned int i = 0; i < output.size(); i++)
 	{
 		std::cout << output[i] << ", ";
 	}
+
+	std::cout << "\n\033[1;35m[OK]\033[0m\n";
 
 	std::cout << std::endl;
 	return 0;

@@ -145,7 +145,7 @@ std::vector<double> ParticleSwarmOptimisation::Train(std::vector<std::vector<dou
 		if (r != 0)
 			std::cout << "\x1b[A";
 		
-		std::cout << "Progress: " << ((double)(r + 1) / (double)repeat) * 100.0 << std::endl;
+		std::cout << "Progress: " << ((double)r / (double)repeat) * 100.0 << std::endl;
 
 		r++;
 	}

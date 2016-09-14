@@ -6,19 +6,9 @@ using namespace Structure;
 LinearNetwork::LinearNetwork(int input, int hidden, int output, ActivationType hiddenType, ActivationType outputType, ConnectionType connections)
 {
 	//Check for errors
-	if (input < 1)
+	if (input < 1 || hidden < 1 || output < 1)
 	{
-		std::cout << "input size needs to be 1 or greater" << std::endl;
-		throw 20;
-	}
-	if (hidden < 1)
-	{
-		std::cout << "hidden size needs to be 1 or greater" << std::endl;
-		throw 20;
-	}
-	if (output < 1)
-	{
-		std::cout << "output size needs to be 1 or greater" << std::endl;
+		std::cout << "input, hidden & output size needs to be 1 or greater" << std::endl;
 		throw 20;
 	}
 
