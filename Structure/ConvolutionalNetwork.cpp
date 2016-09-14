@@ -16,8 +16,7 @@ ConvolutionalNetwork::ConvolutionalNetwork(int input, int hidden, int output, in
 		throw 20;
 	}
 
-	//networks.resize(amount - 1);
-	for (int i = 0; i < amount - 1; i++)
+	for (int i = 0; i < amount; i++)
 	{
 		networks.push_back(LinearNetwork(input * 2, hidden, output, hiddenType, outputType, connection));
 	}

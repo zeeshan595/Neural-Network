@@ -16,10 +16,10 @@ ConvolutionalNetwork2D::ConvolutionalNetwork2D(int input, int hidden, int output
 		throw 20;
 	}
 
-	networks.resize(amountX - 1);
-	for (int i = 0; i < amountX - 1; i++)
+	networks.resize(amountX);
+	for (int i = 0; i < amountX; i++)
 	{
-		for (int j = 0; j < amountY - 1; j++)
+		for (int j = 0; j < amountY; j++)
 		{
 			networks[i].push_back(LinearNetwork(input * 4, hidden, output, hiddenType, outputType, connection));
 		}
