@@ -17,6 +17,8 @@ namespace Learning
 		//CrossOverType crossOver;
 		double (*meanSquaredError)(std::vector<std::vector<double> > data, std::vector<double> weights);
 		GeneticAlgorithm(double (*meanSquaredError)(std::vector<std::vector<double> > data, std::vector<double> weights), std::vector<double> weights);
+		~GeneticAlgorithm();
+
 		std::vector<double> Train(std::vector<std::vector<double> > trainData, int generations, int population, int mutationAmount);
 
 	private:

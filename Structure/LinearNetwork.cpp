@@ -120,23 +120,23 @@ LinearNetwork::~LinearNetwork()
 {
 	for (int i = 0; i < this->input; i++)
 	{
-		ihweights[i].erase(ihweights[i].begin(), ihweights[i].begin() + ihweights[i].size());
-		ihweightsDisabled[i].erase(ihweightsDisabled[i].begin(), ihweightsDisabled[i].begin() + ihweightsDisabled[i].size());
+		ihweights[i].erase(ihweights[i].begin(), ihweights[i].end());
+		ihweightsDisabled[i].erase(ihweightsDisabled[i].begin(), ihweightsDisabled[i].end());
 	}
 
 	for (int i = 0; i < this->hidden; i++)
 	{
-		howeights[i].erase(howeights[i].begin(), howeights[i].begin() + howeights[i].size());
-		howeightsDisabled[i].erase(howeightsDisabled[i].begin(), howeightsDisabled[i].begin() + howeightsDisabled[i].size());
+		howeights[i].erase(howeights[i].begin(), howeights[i].end());
+		howeightsDisabled[i].erase(howeightsDisabled[i].begin(), howeightsDisabled[i].end());
 	}
 
-	ihweightsDisabled.erase(ihweightsDisabled.begin(), ihweightsDisabled.begin() + ihweightsDisabled.size());
-	howeightsDisabled.erase(howeightsDisabled.begin(), howeightsDisabled.begin() + howeightsDisabled.size());
-	hiddenBiases.erase(hiddenBiases.begin(), hiddenBiases.begin() + hiddenBiases.size());
-	outputBiases.erase(outputBiases.begin(), outputBiases.begin() + outputBiases.size());
-	ihweights.erase(ihweights.begin(), ihweights.begin() + ihweights.size());
-	howeights.erase(howeights.begin(), howeights.begin() + howeights.size());
-	hOutputs.erase(hOutputs.begin(), hOutputs.begin() + hOutputs.size());
+	ihweightsDisabled.erase(ihweightsDisabled.begin(), ihweightsDisabled.end());
+	howeightsDisabled.erase(howeightsDisabled.begin(), howeightsDisabled.end());
+	hiddenBiases.erase(hiddenBiases.begin(), hiddenBiases.end());
+	outputBiases.erase(outputBiases.begin(), outputBiases.end());
+	ihweights.erase(ihweights.begin(), ihweights.end());
+	howeights.erase(howeights.begin(), howeights.end());
+	hOutputs.erase(hOutputs.begin(), hOutputs.end());
 }
 
 std::vector<double> LinearNetwork::GetWeights()

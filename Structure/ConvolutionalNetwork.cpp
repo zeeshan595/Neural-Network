@@ -24,7 +24,7 @@ ConvolutionalNetwork::ConvolutionalNetwork(int input, int hidden, int output, in
 
 ConvolutionalNetwork::~ConvolutionalNetwork()
 {
-	
+	networks.erase(networks.begin(), networks.end());
 }
 
 std::vector<std::vector<double> > ConvolutionalNetwork::Compute(std::vector<std::vector<double> > input)

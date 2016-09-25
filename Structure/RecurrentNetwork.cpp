@@ -27,6 +27,11 @@ RecurrentNetwork::RecurrentNetwork(int input, int hidden, int output, int amount
 	}
 }
 
+RecurrentNetwork::~RecurrentNetwork()
+{
+	networks.erase(networks.begin(), networks.end());
+}
+
 std::vector<double> RecurrentNetwork::Compute(std::vector<std::vector<double> > input)
 {
 	if (input.size() != networks.size() || input[0].size() != (unsigned int)networks[0].GetInput())

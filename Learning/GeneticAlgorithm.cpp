@@ -10,6 +10,12 @@ GeneticAlgorithm::GeneticAlgorithm(double (*meanSquaredError)(std::vector<std::v
 	max = +10.0;
 }
 
+GeneticAlgorithm::~GeneticAlgorithm()
+{
+	weights.erase(weights.begin(), weights.end());
+	meanSquaredError = NULL;
+}
+
 std::vector<double> GeneticAlgorithm::Train(std::vector<std::vector<double> > trainData, int generations, int population, int mutationAmount)
 {
 	if (population < 2)

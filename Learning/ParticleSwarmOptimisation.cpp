@@ -70,6 +70,7 @@ std::vector<double> ParticleSwarmOptimisation::Train(std::vector<std::vector<dou
 	//Start Trainning Loop
 	while (r < repeat)
 	{
+
 		//Stop If Error Is To Low
 		if (bestGlobalError < exitError)
 			break;
@@ -89,9 +90,9 @@ std::vector<double> ParticleSwarmOptimisation::Train(std::vector<std::vector<dou
 			{
 				r1 = (double)rand() / RAND_MAX;
 				r2 = (double)rand() / RAND_MAX;
-				newVelocity[j] = (inertiaWeight * swarm[i].velocity[j]) +
+				newVelocity[j] = ((inertiaWeight * swarm[i].velocity[j]) +
 					(cognitiveWeight * r1 * (swarm[i].bestPosition[j] - swarm[i].position[j])) +
-					(socialWeight * r2 * (bestGlobalPosition[j] - swarm[i].position[j]));
+					(socialWeight * r2 * (bestGlobalPosition[j] - swarm[i].position[j])));
 			}
 			swarm[i].velocity = newVelocity;
 		
@@ -145,7 +146,7 @@ std::vector<double> ParticleSwarmOptimisation::Train(std::vector<std::vector<dou
 		if (r != 0)
 			std::cout << "\x1b[A";
 		
-		std::cout << "Progress: " << ((double)r / (double)repeat) * 100.0 << std::endl;
+		std::cout << "Progress: " << ((double)r / (double)repeat) * 100.0 << "  Error: " << bestGlobalError << std::endl;
 
 		r++;
 	}

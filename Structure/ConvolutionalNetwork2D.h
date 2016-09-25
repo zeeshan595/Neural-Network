@@ -17,6 +17,8 @@ namespace Structure
 	public:
 		std::vector<std::vector<LinearNetwork> > networks;
 		ConvolutionalNetwork2D(int input, int hidden, int output, int amountX, int amountY, ActivationType hiddenType, ActivationType outputType, ConnectionType connection);
+		~ConvolutionalNetwork2D();
+
 		std::vector<std::vector<std::vector<double> > > Compute(std::vector<std::vector<std::vector<double> > > input);
 		int GetAmountX();
 		int GetAmountY();

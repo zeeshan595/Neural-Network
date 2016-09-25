@@ -29,6 +29,15 @@ ConvolutionalNetwork2D::ConvolutionalNetwork2D(int input, int hidden, int output
 	this->amountY = amountY;
 }
 
+ConvolutionalNetwork2D::~ConvolutionalNetwork2D()
+{
+	for (unsigned int i = 0; i < networks.size(); i++)
+	{
+		networks[i].erase(networks[i].begin(), networks[i].end());
+	}
+	networks.erase(networks.begin(), networks.end());
+}
+
 std::vector<std::vector<std::vector<double> > > ConvolutionalNetwork2D::Compute(std::vector<std::vector<std::vector<double> > > input)
 {
 	if (input.size() != networks.size() + 1 || input[0].size() != networks[0].size() + 1 || input[0][0].size() != (unsigned int)networks[0][0].GetInput())

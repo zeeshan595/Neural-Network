@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <limits>
+#include <cmath>
 
 namespace Learning
 {
@@ -17,7 +18,7 @@ namespace Learning
 
 		double inertiaWeight;
 		double cognitiveWeight;
-		double socialWeight;		
+		double socialWeight;
 	
 		double (*meanSquaredError)(std::vector<std::vector<double> > data, std::vector<double> weights);
 		ParticleSwarmOptimisation(double (*meanSquaredError)(std::vector<std::vector<double> > data, std::vector<double> weights), std::vector<double> weights);
@@ -38,11 +39,7 @@ namespace Learning
 			double error;
 			double bestError;
 			
-			Particle()
-			{
-				
-			}
-
+			Particle(){}
 			Particle(std::vector<double> position, std::vector<double> velocity, double error)
 			{
 				this->position = position;
@@ -50,6 +47,13 @@ namespace Learning
 				this->bestPosition = position;
 				this->error = error;
 				this->bestError = error;
+			}
+
+			~Particle()
+			{
+				position.erase(position.begin(), position.end());
+				velocity.erase(position.begin(), position.end());
+				bestPosition.erase(position.begin(), position.end());
 			}
 		};
 	};

@@ -46,17 +46,23 @@ int main()
 
 	std::cout << "Recurrent Network ";
 
-	RecurrentNetwork recNet(4, 7, 3, 5, LOGISTIC_SIGMOID, SOFTMAX, CONNECT_ALL);
+	RecurrentNetwork* recNet = new RecurrentNetwork(4, 7, 3, 5, LOGISTIC_SIGMOID, SOFTMAX, CONNECT_ALL);
+
+	delete recNet;
 
 	std::cout << "\033[1;34m[OK]\033[0m\n";
 	std::cout << "Convolutional Network ";
 
-	ConvolutionalNetwork convNet(4, 7, 3, 5, LOGISTIC_SIGMOID, SOFTMAX, CONNECT_ALL);
+	ConvolutionalNetwork* convNet = new ConvolutionalNetwork(4, 7, 3, 5, LOGISTIC_SIGMOID, SOFTMAX, CONNECT_ALL);
+	
+	delete convNet;
 
 	std::cout << "\033[1;34m[OK]\033[0m\n";
 	std::cout << "Convolutional Network 2D ";
 
-	ConvolutionalNetwork2D convNet2D(4, 7, 3, 5, 6, LOGISTIC_SIGMOID, SOFTMAX, CONNECT_ALL);
+	ConvolutionalNetwork2D* convNet2D = new ConvolutionalNetwork2D(4, 7, 3, 5, 6, LOGISTIC_SIGMOID, SOFTMAX, CONNECT_ALL);
+
+	delete convNet2D;
 
 	std::cout << "\033[1;34m[OK]\033[0m\n";
 
@@ -76,10 +82,11 @@ int main()
 	input.resize(4);
 	std::vector<double> output;
 
+	//Trainning Tests
 	std::cout << "Genetic Algorithm Using Linear Network Structure" << std::endl;
-	GeneticAlgorithm ga(meanSquaredError, network.GetWeights());
+	GeneticAlgorithm* ga = new GeneticAlgorithm(meanSquaredError, network.GetWeights());
 	std::cout << "Genetic Algorithm Class Created" << std::endl;
-	network.SetWeights(ga.Train(trainData, 1000, 12, 5));
+	network.SetWeights(ga->Train(trainData, 1000, 12, 5));
 	std::cout << "Done Trainning, Now Testing With 5.0,3.0,1.6,0.2" << std::endl;
 	std::cout << "Expected Output 1, 0, 0" << std::endl;
 	input[0] = 5.0;
@@ -93,6 +100,8 @@ int main()
 	{
 		std::cout << output[i] << ", ";
 	}
+
+	delete ga;
 
 	std::cout << "\n\033[1;34m[OK]\033[0m\n";
 
@@ -101,8 +110,8 @@ int main()
 
 	std::cout << "Particle Swarm Optimisation Using Linear Network Structure" << std::endl;
 
-	ParticleSwarmOptimisation pso(meanSquaredError, network.GetWeights());
-	network.SetWeights(pso.Train(trainData, 12, 0.01, 0.005, 1000));
+	ParticleSwarmOptimisation* pso = new ParticleSwarmOptimisation(meanSquaredError, network.GetWeights());
+	network.SetWeights(pso->Train(trainData, 12, 0.01, 0.005, 1000));
 	std::cout << "Done Trainning, Now Testing With 5.0,3.0,1.6,0.2" << std::endl;
 	std::cout << "Expected Output 1, 0, 0" << std::endl;
 	input[0] = 5.0;
@@ -117,7 +126,11 @@ int main()
 		std::cout << output[i] << ", ";
 	}
 
+	delete pso;
+
 	std::cout << "\n\033[1;34m[OK]\033[0m\n";
+
+	std::cin.get();
 
 	std::cout << std::endl;
 	return 0;
