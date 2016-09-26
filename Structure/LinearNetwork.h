@@ -1,48 +1,36 @@
-#ifndef _LINEARNETWORK
-#define _LINEARNETWORK
+#ifndef _LINEAR_NETWORK
+#define _LINEAR_NETWORK
 
-#include <iostream>
-#include <vector>
-#include <cstdlib>
-#include <ctime>
 #include "../Core/Activation.h"
-#include "../Core/ConnectNodes.h"
+#include "../Core/ActivationType.h"
 
-using namespace Core;
+#include <vector>
 
 namespace Structure
 {
-	class LinearNetwork
-	{
-	public:
-		std::vector<double> GetWeights();
-		void SetWeights(std::vector<double> weights);
-		int WeightsLength();
-		int GetInput();
-		int GetOutput();
-		std::vector<double> GethiddenOutputs();
-		LinearNetwork(int input, int hidden, int output, ActivationType hiddenType, ActivationType outputType, ConnectionType connections);
-		~LinearNetwork();
-		std::vector<double> Compute(std::vector<double> input);
-		void ConfigureConnections(ConnectionType type);
-		void GenerateWeights();
+    class LinearNetwork
+    {
+    public:
+        std::vector<int> GetLayers();
+        std::vector<Core::ActivationType> GetActivations();
+        std::vector<double> GetWeights();
+        void SetWeights(std::vector<double> w);
+        int GetWeightsLength();
 
-	private:
-		std::vector<std::vector<bool> > ihweightsDisabled;
-		std::vector<std::vector<bool> > howeightsDisabled;
 
-		int input;
-		int hidden;
-		int output;
-		std::vector<double> hiddenBiases;
-		std::vector<double> outputBiases;
-		std::vector<std::vector<double> > ihweights;
-		std::vector<std::vector<double> > howeights;
-		std::vector<double> hOutputs;
+        LinearNetwork(std::vector<int> layers, std::vector<Core::ActivationType> activations);
+        ~LinearNetwork();
 
-		ActivationType hiddenType;
-		ActivationType outputType;
-	};
+        std::vector<double> Compute(std::vector<double> xValues);
+        void GenerateWeights();
+
+    private:
+        std::vector<int> layers;
+        std::vector<Core::ActivationType> activations;
+    
+        std::vector<std::vector<double> > biases;
+        std::vector<std::vector<std::vector<double> > > weights;
+    };
 };
 
 #endif

@@ -1,264 +1,193 @@
 #include "LinearNetwork.h"
 
-using namespace Core;
-using namespace Structure;
+#include <iostream>
+#include <cassert>
+#include <cstdlib>
+#include <ctime>
 
-LinearNetwork::LinearNetwork(int input, int hidden, int output, ActivationType hiddenType, ActivationType outputType, ConnectionType connections)
+Structure::LinearNetwork::LinearNetwork(std::vector<int> layers, std::vector<Core::ActivationType> activations)
 {
-	//Check for errors
-	if (input < 1 || hidden < 1 || output < 1)
-	{
-		std::cout << "input, hidden & output size needs to be 1 or greater" << std::endl;
-		throw 20;
-	}
+    assert(layers.size() > 1);
+    assert(activations.size() == layers.size());
+    assert(activations[0] == Core::ActivationType::NONE);
 
-	//Setup
-	this->input = input;
-	this->hidden = hidden;
-	this->output = output;
-	this->hiddenType = hiddenType;
-	this->outputType = outputType;
+    this->layers = layers;
+    this->activations = activations;
 
-	//Setup Biases
-	hiddenBiases.resize(hidden);
-	outputBiases.resize(output);
+    //Setup weights & biases
+    //Make sure the input layer is not included so -1
+    weights.resize(layers.size() - 1);
+    biases.resize(layers.size() - 1);
 
-	//Setup Input->Hidden Weights
-	ihweights.resize(input);
-	ihweightsDisabled.resize(input);
-	for (int i = 0; i < input; i++)
-	{
-		ihweights[i].resize(hidden);
-		ihweightsDisabled[i].resize(hidden);
-	}
+    for (unsigned int i = 0; i < layers.size() - 1; i++)
+    {
+        biases[i].resize(layers[i + 1]);
 
-	hOutputs.resize(hidden);
+        weights[i].resize(layers[i + 1]);
+        for (unsigned int j = 0; j < layers[i + 1]; j++)
+        {
+            weights[i][j].resize(layers[i]);
+        }
+    }
 
-	//Setup Hidden->Output Weights
-	howeights.resize(hidden);
-	howeightsDisabled.resize(hidden);
-	for (int i = 0; i < hidden; i++)
-	{
-		howeights[i].resize(output);
-		howeightsDisabled[i].resize(output);
-	}
-
-	//Generate Random Weights
-	GenerateWeights();
-
-	//Setup connections
-	ConfigureConnections(connections);
+    GenerateWeights();
 }
 
-std::vector<double> LinearNetwork::Compute(std::vector<double> input)
+void Structure::LinearNetwork::GenerateWeights()
 {
-	if (input.size() != (unsigned int)this->input)
-	{
-		std::cout << "input size does not match" << std::endl;
-		throw 20;
-	}
+    std::srand(std::time(0));
+    double low  = -0.01;
+    double high = +0.01;
 
-	//Setup
-	std::vector<double> hiddenValues;
-	std::vector<double> outputValues;
-	hiddenValues.resize(this->hidden);
-	outputValues.resize(this->output);
+    for (unsigned int i = 0; i < layers.size() - 1; i++)
+    {
+        for (unsigned int j = 0; j < layers[i + 1]; j++)
+        {
+            biases[i][j] = (high - low) * ((double)rand() / RAND_MAX) + low;
 
-	for (int i = 0; i < this->hidden; i++)
-	{
-		hiddenValues[i] = 0;
-	}
-	for (int i = 0; i < this->output; i++)
-	{
-		outputValues[i] = 0;
-	}
-	
-	/* Input->Hidden */
-	//Weights
-	for (int i = 0; i < this->input; i++)
-	{
-		for (int j = 0; j < this->hidden; j++)
-		{
-			if (ihweightsDisabled[i][j])
-				hiddenValues[j] += ihweights[i][j] * input[i];
-		}
-	}
-
-	//Biases
-	for (int i = 0; i < this->hidden; i++)
-	{
-		hiddenValues[i] += hiddenBiases[i];
-	}
-
-	//Activation
-	hOutputs = ActivationMethods::Activation(hiddenValues, hiddenType);
-
-	/* Hidden->Output */
-	//Weights
-	for (int i = 0; i < this->hidden; i++)
-	{
-		for (int j = 0; j < this->output; j++)
-		{
-			if (howeightsDisabled[i][j])
-				outputValues[j] += howeights[i][j] * hOutputs[i];
-		}
-	}
-
-	//Biases
-	for (int i = 0; i < this->output; i++)
-	{
-		outputValues[i] += outputBiases[i];
-	}
-
-	//Activation
-	outputValues = ActivationMethods::Activation(outputValues, outputType);
-
-	return outputValues;
+            for (unsigned int k = 0; k < layers[i]; k++)
+            {
+                weights[i][j][k] = (high - low) * ((double)rand() / RAND_MAX) + low;
+            }
+        }
+    }
 }
 
-LinearNetwork::~LinearNetwork()
+Structure::LinearNetwork::~LinearNetwork()
 {
-	for (int i = 0; i < this->input; i++)
-	{
-		ihweights[i].erase(ihweights[i].begin(), ihweights[i].end());
-		ihweightsDisabled[i].erase(ihweightsDisabled[i].begin(), ihweightsDisabled[i].end());
-	}
 
-	for (int i = 0; i < this->hidden; i++)
-	{
-		howeights[i].erase(howeights[i].begin(), howeights[i].end());
-		howeightsDisabled[i].erase(howeightsDisabled[i].begin(), howeightsDisabled[i].end());
-	}
-
-	ihweightsDisabled.erase(ihweightsDisabled.begin(), ihweightsDisabled.end());
-	howeightsDisabled.erase(howeightsDisabled.begin(), howeightsDisabled.end());
-	hiddenBiases.erase(hiddenBiases.begin(), hiddenBiases.end());
-	outputBiases.erase(outputBiases.begin(), outputBiases.end());
-	ihweights.erase(ihweights.begin(), ihweights.end());
-	howeights.erase(howeights.begin(), howeights.end());
-	hOutputs.erase(hOutputs.begin(), hOutputs.end());
 }
 
-std::vector<double> LinearNetwork::GetWeights()
+std::vector<double> Structure::LinearNetwork::Compute(std::vector<double> xValues)
 {
-	std::vector<double> result;
-	result.resize(WeightsLength());
-	int k = 0;
-	//I->H Weights
-	for (int i = 0; i < this->input; i++)
-	{
-		for (int j = 0; j < this->hidden; j++)
-		{
-			result[k] = ihweights[i][j];
-			k++;
-		}
-	}
+    assert(xValues.size() == layers[0]);
 
-	//Hidden Biases
-	for (int i = 0; i < this->hidden; i++)
-	{
-		result[k] = hiddenBiases[i];
-		k++;
-	}
+    std::vector<double> prev_result = xValues;
+    std::vector<double> result;
 
-	//H->O Weights
-	for (int i = 0; i < this->hidden; i++)
-	{
-		for (int j = 0; j < this->output; j++)
-		{
-			result[k] = howeights[i][j];
-			k++;
-		}
-	}
+    for (unsigned int i = 0; i < layers.size() - 1; i++)
+    {
+        //Reset results
+        result.resize(layers[i + 1]);
+        for (unsigned int j = 0; j < layers[i + 1]; j++)
+            result[j] = 0;
 
-	//Output Biases
-	for (int i = 0; i < this->output; i++)
-	{
-		result[k] = outputBiases[i];
-		k++;
-	}
-	return result;
+        //Compute Weights
+        for (unsigned int j = 0; j < layers[i + 1]; j++)
+        {
+            for (unsigned int k = 0; k < layers[i]; k++)
+            {
+                result[j] += prev_result[k] * weights[i][j][k];
+            }
+        }
+
+        //Add Biases
+        for (unsigned int j = 0; j < layers[i + 1]; j++)
+        {
+            result[j] += biases[i][j];
+        }
+
+        //Apply Activation
+        result = Core::Activation::ApplyActivation(result, activations[i + 1]);
+        prev_result = result;
+    }
+
+    return result;
 }
 
-void LinearNetwork::SetWeights(std::vector<double> weights)
+//-------------------------
+//----Getters & Setters----
+//-------------------------
+
+std::vector<int> Structure::LinearNetwork::GetLayers()
 {
-	if (weights.size() != (unsigned int)WeightsLength())
-	{
-		std::cout << "Weights Length does not match Neural Network" << std::endl;
-		throw 20;
-	}
-
-	int k = 0;
-	//I->H Weights
-	for (int i = 0; i < this->input; i++)
-	{
-		for (int j = 0; j < this->hidden; j++)
-		{
-			ihweights[i][j] = weights[k];
-			k++;
-		}
-	}
-
-	//Hidden Biases
-	for (int i = 0; i < this->hidden; i++)
-	{
-		hiddenBiases[i] = weights[k];
-		k++;
-	}
-
-	//H->O Weights
-	for (int i = 0; i < this->hidden; i++)
-	{
-		for (int j = 0; j < this->output; j++)
-		{
-			howeights[i][j] = weights[k];
-			k++;
-		}
-	}
-
-	//Output Biases
-	for (int i = 0; i < this->output; i++)
-	{
-		outputBiases[i] = weights[k];
-		k++;
-	}
+    return layers;
 }
 
-int LinearNetwork::WeightsLength()
+std::vector<Core::ActivationType> Structure::LinearNetwork::GetActivations()
 {
-	return (this->input * this->hidden) + (this->hidden * this->output) + this->hidden + this->output;
-}
-int LinearNetwork::GetInput()
-{
-	return input;
-}
-int LinearNetwork::GetOutput()
-{
-	return output;
-}
-std::vector<double> LinearNetwork::GethiddenOutputs()
-{
-	return hOutputs;
+    return activations;
 }
 
-void LinearNetwork::GenerateWeights()
+std::vector<double> Structure::LinearNetwork::GetWeights()
 {
-	std::srand(std::time(0));
-	int len = WeightsLength();
-	std::vector<double> initialWeights;
-	initialWeights.resize(len);
-	double low = -0.01;
-	double high = 0.01;
-	for (int i = 0; i < len; i++)
-	{
-		double randomNumber = (double)rand() / RAND_MAX;
-		initialWeights[i] = (high - low) * randomNumber + low;
-	}
-	SetWeights(initialWeights);
+    std::vector<double> result(GetWeightsLength());
+    int L = 0;
+
+    for (unsigned int i = 0; i < layers.size() - 1; i++)
+    {
+        for (unsigned int j = 0; j < layers[i + 1]; j++)
+        {
+            result[L] = biases[i][j];
+            L++;
+        }
+    }
+
+    for (unsigned int i = 0; i < layers.size() - 1; i++)
+    {
+        for (unsigned int j = 0; j < layers[i + 1]; j++)
+        {
+            for (unsigned int k = 0; k < layers[i]; k++)
+            {                
+                result[L] = weights[i][j][k];
+                L++;
+            }
+        }
+    }
+
+    return result;
 }
 
-void LinearNetwork::ConfigureConnections(ConnectionType type)
+void Structure::LinearNetwork::SetWeights(std::vector<double> w)
 {
-	ihweightsDisabled = ConnectionMethod::ConnectNodes(ihweightsDisabled, type);
-	howeightsDisabled = ConnectionMethod::ConnectNodes(howeightsDisabled, type);
+    assert(w.size() == GetWeightsLength());
+
+    int L = 0;
+
+    for (unsigned int i = 0; i < layers.size() - 1; i++)
+    {
+        for (unsigned int j = 0; j < layers[i + 1]; j++)
+        {
+            biases[i][j] = w[L];
+            L++;
+        }
+    }
+
+    for (unsigned int i = 0; i < layers.size() - 1; i++)
+    {
+        for (unsigned int j = 0; j < layers[i + 1]; j++)
+        {
+            for (unsigned int k = 0; k < layers[i]; k++)
+            {                
+                weights[i][j][k] = w[L];
+                L++;
+            }
+        }
+    }
+}
+
+int Structure::LinearNetwork::GetWeightsLength()
+{
+    int L = 0;
+
+    for (unsigned int i = 0; i < layers.size() - 1; i++)
+    {
+        for (unsigned int j = 0; j < layers[i + 1]; j++)
+        {
+            L++;
+        }
+    }
+
+    for (unsigned int i = 0; i < layers.size() - 1; i++)
+    {
+        for (unsigned int j = 0; j < layers[i + 1]; j++)
+        {
+            for (unsigned int k = 0; k < layers[i]; k++)
+            {                
+                L++;
+            }
+        }
+    }
+
+    return L;
 }

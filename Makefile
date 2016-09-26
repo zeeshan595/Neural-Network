@@ -2,48 +2,30 @@
 EXE_NAME 	= Testing
 BUILD_DIR 	= Build/
 COMPILER 	= g++
-CFLAGS 		= -c -Wall -Wc++0x-compat
+CFLAGS 		= -c -Wall -Wc++0x-compat -std=c++11
 LFLAGS 		= -Wall
-OBJS		= $(BUILD_DIR)Testing.so $(BUILD_DIR)ParticleSwarmOptimisation.so $(BUILD_DIR)GeneticAlgorithm.so $(BUILD_DIR)ConnectNodes.so $(BUILD_DIR)LinearNetwork.so $(BUILD_DIR)RecurrentNetwork.so $(BUILD_DIR)ConvolutionalNetwork.so $(BUILD_DIR)ConvolutionalNetwork2D.so $(BUILD_DIR)Activation.so $(BUILD_DIR)CommonFunctions.so
+OBJS		= $(BUILD_DIR)Testing.so $(BUILD_DIR)LinearNetwork.so $(BUILD_DIR)PSO.so $(BUILD_DIR)Activation.so
 
 all : $(OBJS)
 	$(COMPILER) $(LFLAGS) $(OBJS) -o $(BUILD_DIR)$(EXE_NAME)
 
-$(BUILD_DIR)Testing.so : Testing.cpp Structure/LinearNetwork.h Core/Activation.h Core/ConnectNodes.h
+$(BUILD_DIR)Testing.so : Testing.cpp
 	$(COMPILER) $(CFLAGS) Testing.cpp -o $(BUILD_DIR)Testing.so
 
-#Structures
+#Structure
 
-$(BUILD_DIR)LinearNetwork.so : Structure/LinearNetwork.cpp Structure/LinearNetwork.h Core/Activation.h Core/ConnectNodes.h
+$(BUILD_DIR)LinearNetwork.so : Structure/LinearNetwork.h Structure/LinearNetwork.cpp
 	$(COMPILER) $(CFLAGS) Structure/LinearNetwork.cpp -o $(BUILD_DIR)LinearNetwork.so
-
-$(BUILD_DIR)ConvolutionalNetwork.so : Structure/ConvolutionalNetwork.cpp Structure/ConvolutionalNetwork.h
-	$(COMPILER) $(CFLAGS) Structure/ConvolutionalNetwork.cpp -o $(BUILD_DIR)ConvolutionalNetwork.so
-
-$(BUILD_DIR)ConvolutionalNetwork2D.so : Structure/ConvolutionalNetwork2D.cpp Structure/ConvolutionalNetwork2D.h
-	$(COMPILER) $(CFLAGS) Structure/ConvolutionalNetwork2D.cpp -o $(BUILD_DIR)ConvolutionalNetwork2D.so
-
-$(BUILD_DIR)RecurrentNetwork.so : Structure/RecurrentNetwork.cpp Structure/RecurrentNetwork.h
-	$(COMPILER) $(CFLAGS) Structure/RecurrentNetwork.cpp -o $(BUILD_DIR)RecurrentNetwork.so
 
 #Learning
 
-$(BUILD_DIR)ParticleSwarmOptimisation.so : Learning/ParticleSwarmOptimisation.cpp Learning/ParticleSwarmOptimisation.h
-	$(COMPILER) $(CFLAGS) Learning/ParticleSwarmOptimisation.cpp -o $(BUILD_DIR)ParticleSwarmOptimisation.so
-
-$(BUILD_DIR)GeneticAlgorithm.so : Learning/GeneticAlgorithm.cpp Learning/GeneticAlgorithm.h
-	$(COMPILER) $(CFLAGS) Learning/GeneticAlgorithm.cpp -o $(BUILD_DIR)GeneticAlgorithm.so
+$(BUILD_DIR)PSO.so : Learning/PSO.h Learning/PSO.cpp
+	$(COMPILER) $(CFLAGS) Learning/PSO.cpp -o $(BUILD_DIR)PSO.so
 
 #Core
 
-$(BUILD_DIR)Activation.so : Core/Activation.cpp Core/Activation.h
+$(BUILD_DIR)Activation.so : Core/Activation.h Core/Activation.cpp
 	$(COMPILER) $(CFLAGS) Core/Activation.cpp -o $(BUILD_DIR)Activation.so
-
-$(BUILD_DIR)ConnectNodes.so : Core/ConnectNodes.cpp Core/ConnectNodes.h
-	$(COMPILER) $(CFLAGS) Core/ConnectNodes.cpp -o $(BUILD_DIR)ConnectNodes.so
-
-$(BUILD_DIR)CommonFunctions.so : Core/CommonFunctions.cpp Core/CommonFunctions.h
-	$(COMPILER) $(CFLAGS) Core/CommonFunctions.cpp -o $(BUILD_DIR)CommonFunctions.so
 
 #Other
 
