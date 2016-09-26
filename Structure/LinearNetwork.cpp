@@ -24,7 +24,7 @@ Structure::LinearNetwork::LinearNetwork(std::vector<int> layers, std::vector<Cor
         biases[i].resize(layers[i + 1]);
 
         weights[i].resize(layers[i + 1]);
-        for (unsigned int j = 0; j < layers[i + 1]; j++)
+        for (int j = 0; j < layers[i + 1]; j++)
         {
             weights[i][j].resize(layers[i]);
         }
@@ -41,11 +41,11 @@ void Structure::LinearNetwork::GenerateWeights()
 
     for (unsigned int i = 0; i < layers.size() - 1; i++)
     {
-        for (unsigned int j = 0; j < layers[i + 1]; j++)
+        for (int j = 0; j < layers[i + 1]; j++)
         {
             biases[i][j] = (high - low) * ((double)rand() / RAND_MAX) + low;
 
-            for (unsigned int k = 0; k < layers[i]; k++)
+            for (int k = 0; k < layers[i]; k++)
             {
                 weights[i][j][k] = (high - low) * ((double)rand() / RAND_MAX) + low;
             }
@@ -60,7 +60,7 @@ Structure::LinearNetwork::~LinearNetwork()
 
 std::vector<double> Structure::LinearNetwork::Compute(std::vector<double> xValues)
 {
-    assert(xValues.size() == layers[0]);
+    assert(xValues.size() == (unsigned int)layers[0]);
 
     std::vector<double> prev_result = xValues;
     std::vector<double> result;
@@ -69,20 +69,20 @@ std::vector<double> Structure::LinearNetwork::Compute(std::vector<double> xValue
     {
         //Reset results
         result.resize(layers[i + 1]);
-        for (unsigned int j = 0; j < layers[i + 1]; j++)
+        for (int j = 0; j < layers[i + 1]; j++)
             result[j] = 0;
 
         //Compute Weights
-        for (unsigned int j = 0; j < layers[i + 1]; j++)
+        for (int j = 0; j < layers[i + 1]; j++)
         {
-            for (unsigned int k = 0; k < layers[i]; k++)
+            for (int k = 0; k < layers[i]; k++)
             {
                 result[j] += prev_result[k] * weights[i][j][k];
             }
         }
 
         //Add Biases
-        for (unsigned int j = 0; j < layers[i + 1]; j++)
+        for (int j = 0; j < layers[i + 1]; j++)
         {
             result[j] += biases[i][j];
         }
@@ -116,7 +116,7 @@ std::vector<double> Structure::LinearNetwork::GetWeights()
 
     for (unsigned int i = 0; i < layers.size() - 1; i++)
     {
-        for (unsigned int j = 0; j < layers[i + 1]; j++)
+        for (int j = 0; j < layers[i + 1]; j++)
         {
             result[L] = biases[i][j];
             L++;
@@ -125,9 +125,9 @@ std::vector<double> Structure::LinearNetwork::GetWeights()
 
     for (unsigned int i = 0; i < layers.size() - 1; i++)
     {
-        for (unsigned int j = 0; j < layers[i + 1]; j++)
+        for (int j = 0; j < layers[i + 1]; j++)
         {
-            for (unsigned int k = 0; k < layers[i]; k++)
+            for (int k = 0; k < layers[i]; k++)
             {                
                 result[L] = weights[i][j][k];
                 L++;
@@ -140,13 +140,13 @@ std::vector<double> Structure::LinearNetwork::GetWeights()
 
 void Structure::LinearNetwork::SetWeights(std::vector<double> w)
 {
-    assert(w.size() == GetWeightsLength());
+    assert(w.size() == (unsigned int)GetWeightsLength());
 
     int L = 0;
 
     for (unsigned int i = 0; i < layers.size() - 1; i++)
     {
-        for (unsigned int j = 0; j < layers[i + 1]; j++)
+        for (int j = 0; j < layers[i + 1]; j++)
         {
             biases[i][j] = w[L];
             L++;
@@ -155,9 +155,9 @@ void Structure::LinearNetwork::SetWeights(std::vector<double> w)
 
     for (unsigned int i = 0; i < layers.size() - 1; i++)
     {
-        for (unsigned int j = 0; j < layers[i + 1]; j++)
+        for (int j = 0; j < layers[i + 1]; j++)
         {
-            for (unsigned int k = 0; k < layers[i]; k++)
+            for (int k = 0; k < layers[i]; k++)
             {                
                 weights[i][j][k] = w[L];
                 L++;
@@ -172,7 +172,7 @@ int Structure::LinearNetwork::GetWeightsLength()
 
     for (unsigned int i = 0; i < layers.size() - 1; i++)
     {
-        for (unsigned int j = 0; j < layers[i + 1]; j++)
+        for (int j = 0; j < layers[i + 1]; j++)
         {
             L++;
         }
@@ -180,9 +180,9 @@ int Structure::LinearNetwork::GetWeightsLength()
 
     for (unsigned int i = 0; i < layers.size() - 1; i++)
     {
-        for (unsigned int j = 0; j < layers[i + 1]; j++)
+        for (int j = 0; j < layers[i + 1]; j++)
         {
-            for (unsigned int k = 0; k < layers[i]; k++)
+            for (int k = 0; k < layers[i]; k++)
             {                
                 L++;
             }

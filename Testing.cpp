@@ -10,11 +10,11 @@ Structure::LinearNetwork network({ 4, 7, 3 }, { Core::ActivationType::NONE, Core
 
 int main()
 {
-	std::vector<std::vector<double> > trainData(150);
-	for (int i = 0; i < 150; i++)
+	std::vector<std::vector<double> > trainData(DATA_SIZE);
+	for (int i = 0; i < DATA_SIZE; i++)
 	{
-		trainData[i].resize(7);
-		for (int j = 0; j < 7; j++)
+		trainData[i].resize(LEN);
+		for (int j = 0; j < LEN; j++)
 		{
 			trainData[i][j] = dataset[i][j];
 		}
@@ -31,10 +31,8 @@ int main()
 double meanSquaredError(std::vector<std::vector<double> > data, std::vector<double> weights)
 {
 	network.SetWeights(weights);
-	std::vector<double> xValues;
-	xValues.resize(network.GetLayers()[0]);// inputs
-	std::vector<double> tValues;
-	tValues.resize(network.GetLayers()[network.GetLayers().size() - 1]);// targets
+	std::vector<double> xValues(network.GetLayers()[0]); //Inputs
+	std::vector<double> tValues(network.GetLayers()[network.GetLayers().size() - 1]);// targets
 	double sumSquaredError = 0.0;
 	for (unsigned int i = 0; i < data.size(); ++i)
 	{

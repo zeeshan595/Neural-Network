@@ -54,7 +54,7 @@ std::vector<double> Learning::ParticleSwarmOptimisation::Train(std::vector<std::
 		}
 		swarm[i] = Particle(randomPosition, randomVelocity, error);
 	}
-
+	
 	//Randomise Sequence
 	std::vector<int> sequence(particles);
 	for (int i = 0; i < particles; i++)
@@ -157,15 +157,19 @@ std::vector<double> Learning::ParticleSwarmOptimisation::Train(std::vector<std::
 						mutationSize--;
 					}
 				}
-
+				
+				//Update particles position
 				swarm[target].position = newPosition;
 			}
 		}
 
-		if (r != 0)
-			std::cout << "\x1b[A";
-		
-		std::cout << "Progress: " << (int)(((double)r / (double)repeat) * 100.0) << "  Error: " << bestGlobalError << std::endl;
+		{
+			//Display Progress
+			if (r != 0)
+				std::cout << "\x1b[A";
+			
+			std::cout << "Progress: " << (int)(((double)r / (double)repeat) * 100.0) << "  Error: " << bestGlobalError << std::endl;
+		}
 
 		r++;
 	}
