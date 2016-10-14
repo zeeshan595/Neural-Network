@@ -11,6 +11,6 @@ namespace Core
         HEAVISIDE_STEP,
         SOFTMAX
     };
-}
+};
 
 #endif

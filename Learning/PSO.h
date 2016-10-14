@@ -1,28 +1,29 @@
 #ifndef _PSO
 #define _PSO
 
-#include <vector>
+#include "../Structure/BaseNetwork.h"
 
 namespace Learning
 {
     class ParticleSwarmOptimisation
     {
     public:
-        double min;
-        double max;
+        bool auto_assign_best_value;
+        double MIN;
+        double MAX;
 
         double inertia_weight;
         double cognitive_weight;
         double social_weight;
 
-        double (*meanSquaredError)(std::vector<std::vector<double> > data, std::vector<double> weights);
-        ParticleSwarmOptimisation(double (*meanSquaredError)(std::vector<std::vector<double> > data, std::vector<double> weights), int weightsLen);
+        ParticleSwarmOptimisation(Structure::BaseNetwork* network);
         ~ParticleSwarmOptimisation();
 
-        std::vector<double> Train(std::vector<std::vector<double> > trainData, int particles, double exitError, double deathProbability, int repeat);
+        std::vector<double> Train(std::vector<std::vector<double> > train_data, int particles, double exit_error, double death_probability, int repeat);
 
     private:
-        int weightsLen;
+        Structure::BaseNetwork* network;
+
         std::vector<int> Shuffle(std::vector<int> sequence);
 
         class Particle
@@ -31,25 +32,25 @@ namespace Learning
             std::vector<double> position;
             std::vector<double> velocity;
 
-            std::vector<double> bestPosition;
+            std::vector<double> best_position;
             double error;
-            double bestError;
+            double best_error;
 
             Particle(){}
             Particle(std::vector<double> position, std::vector<double> velocity, double error)
 			{
 				this->position = position;
 				this->velocity = velocity;
-				this->bestPosition = position;
+				this->best_position = position;
 				this->error = error;
-				this->bestError = error;
+				this->best_error = error;
 			}
 
             ~Particle()
 			{
 				position.erase(position.begin(), position.end());
 				velocity.erase(position.begin(), position.end());
-				bestPosition.erase(position.begin(), position.end());
+				best_position.erase(position.begin(), position.end());
 			}
         };
     };

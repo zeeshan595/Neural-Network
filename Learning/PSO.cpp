@@ -1,22 +1,23 @@
 #include "PSO.h"
 
+#include <cassert>
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
 #include <limits>
 #include <cmath>
 
-Learning::ParticleSwarmOptimisation::ParticleSwarmOptimisation(double (*meanSquaredError)(std::vector<std::vector<double> > data, std::vector<double> weights), int weightsLen)
+Learning::ParticleSwarmOptimisation::ParticleSwarmOptimisation(Structure::BaseNetwork* network)
 {
-    this->meanSquaredError = meanSquaredError;
-	this->weightsLen = weightsLen;
+    this->network = network;
+	auto_assign_best_value = true;
 
-	min = -10.0;
-	max = +10.0;
+    MIN = -10.0;
+    MAX = +10.0;
 
-	inertia_weight 		= 0.729;
-	cognitive_weight 	= 1.49445;
-	social_weight 		= 1.49445;
+    inertia_weight      = 0.729;
+    cognitive_weight    = 1.49445;
+    social_weight       = 1.49445;
 }
 
 Learning::ParticleSwarmOptimisation::~ParticleSwarmOptimisation()
@@ -24,168 +25,186 @@ Learning::ParticleSwarmOptimisation::~ParticleSwarmOptimisation()
 
 }
 
-std::vector<double> Learning::ParticleSwarmOptimisation::Train(std::vector<std::vector<double> > trainData, int particles, double exitError, double deathProbability, int repeat)
+std::vector<double> Learning::ParticleSwarmOptimisation::Train(std::vector<std::vector<double> > train_data, int particles, double exit_error, double death_probability, int repeat)
 {
-    //Setup
+	assert((int)train_data[0].size() == network->GetInputs() + network->GetOutputs());
+	assert(particles > 0);
+	assert(death_probability < 1 && death_probability > 0);
+	assert(repeat > 0);
+	assert(exit_error > 0);
+	assert(train_data.size() > 0);
+
+	//setup
+	int weights_length = network->GetWeightsLength();
+	std::vector<double> current_weights = network->GetWeights();
+
+	int r = 0; //repeat
 	std::srand(std::time(0));
-	int r = 0; //Repeat
-	double r1, r2;// Randomisation
-	std::vector<Particle> swarm;
-	swarm.resize(particles);
-	std::vector<double> bestGlobalPosition(weightsLen);
-	double bestGlobalError = std::numeric_limits<double>::max();
+	double r1, r2; //Randomisers
+	std::vector<Particle> swarm(particles);
+	std::vector<double> best_global_position(weights_length);
+	double best_global_error = std::numeric_limits<double>::max();
 
-	//Create Particles
-	for (int i = 0; i < particles; i++)
+	//Set 1st particle's position to current weights
 	{
-		std::vector<double> randomPosition(weightsLen);
-		for (int j = 0; j < weightsLen; j++)
+		double error = network->MeanSquaredError(train_data, current_weights);
+		std::vector<double> random_velocity(weights_length);
+		for (int j = 0; j < weights_length; j++)
 		{
-			randomPosition[j] = (max - min) * ((double)rand() / RAND_MAX) + min;
+			double low  = 0.1 * MIN;
+			double high = 0.1 * MAX;
+			random_velocity[j] = (high - low) * ((double)std::rand() / RAND_MAX) + low;
 		}
-		double error = meanSquaredError(trainData, randomPosition);
+		swarm[0] = Particle(current_weights, random_velocity, error);
 
-		std::vector<double> randomVelocity(weightsLen);
-		for (int j = 0; j < weightsLen; j++)
+		if (error < best_global_error)
 		{
-			double low  = 0.1 * min;
-			double high = 0.1 * max;
-            randomVelocity[j] = (high - low) * ((double)rand() / RAND_MAX) + low;
+			best_global_position = current_weights;
+			best_global_error = error;
 		}
-		swarm[i] = Particle(randomPosition, randomVelocity, error);
 	}
-	
-	//Randomise Sequence
+
+	//Create Particles and assign random postions & velocity
+	for (int i = 1; i < particles; i++)
+	{
+		//Compute Random Position
+		std::vector<double> random_position(weights_length);
+		for (int j = 0; j < weights_length; j++)
+		{
+			random_position[j] = (MAX - MIN) * ((double)std::rand() / RAND_MAX) + MIN;
+		}
+		//Get Error
+		double error = network->MeanSquaredError(train_data, random_position);
+
+		//Compute Random Velocity
+		std::vector<double> random_velocity(weights_length);
+		for (int j = 0; j < weights_length; j++)
+		{
+			double low  = 0.1 * MIN;
+			double high = 0.1 * MAX;
+			random_velocity[j] = (high - low) * ((double)std::rand() / RAND_MAX) + low;
+		}
+		swarm[i] = Particle(random_position, random_velocity, error);
+
+		if (error < best_global_error)
+		{
+			best_global_position = random_position;
+			best_global_error = error;
+		}
+	}
+
+	//Create a sequence to randomse particles in future
 	std::vector<int> sequence(particles);
 	for (int i = 0; i < particles; i++)
-	{
 		sequence[i] = i;
-	}
-
+	
 	//Start Trainning Loop
 	while (r < repeat)
 	{
-
-		//Stop If Error Is To Low
-		if (bestGlobalError < exitError)
+		//If error is too low then break loop
+		if (best_global_error < exit_error)
 			break;
-		
-		//sequence = Shuffle(sequence);
-		std::vector<double> newVelocity(weightsLen);
-		std::vector<double> newPosition(weightsLen);
-		double newError;
 
+		//Shuffle particles order using sequence
+		sequence = Shuffle(sequence);
+
+		//Setup
+		std::vector<double> new_position(weights_length);
+		std::vector<double> new_velocity(weights_length);
+		double new_error;
+
+		//go throw all particles
 		for (int pi = 0; pi < particles; pi++)
 		{
-			//Calculate Velocity
+			//Select random particle
 			int i = sequence[pi];
-			for (int j = 0; j < weightsLen; j++)
+
+			//Calculate Velocity
+			for (int j = 0; j < weights_length; j++)
 			{
-				r1 = (double)rand() / RAND_MAX;
-				r2 = (double)rand() / RAND_MAX;
-				newVelocity[j] = 	((inertia_weight  * swarm[i].velocity[j]) +
-									(cognitive_weight 	* r1 * (swarm[i].bestPosition[j] 	- swarm[i].position[j])) +
-									(social_weight 		* r2 * (bestGlobalPosition[j] 		- swarm[i].position[j])));
+				r1 = (double)std::rand() / RAND_MAX;
+				r2 = (double)std::rand() / RAND_MAX;
+				new_velocity[j] = 	((inertia_weight  	* swarm[i].velocity[j]) +
+									(cognitive_weight 	* r1 * (swarm[i].best_position[j] 	- swarm[i].position[j])) +
+									(social_weight 		* r2 * (best_global_position[j] 	- swarm[i].position[j])));
 			}
-			swarm[i].velocity = newVelocity;
-		
+			swarm[i].velocity = new_velocity;
+
 			//Calculate Position
-			for (int j = 0; j < weightsLen; j++)
+			for (int j = 0; j < weights_length; j++)
 			{
-				newPosition[j] = swarm[i].position[j] + newVelocity[j];
-				//Keep position in range
-				if (newPosition[j] < min)
-					newPosition[j] = min;
-				else if (newPosition[j] > max)
-					newPosition[j] = max;
+				new_position[j] = swarm[i].position[j] + new_velocity[j];
+				//keep position in range
+				if (new_position[j] < MIN)
+					new_position[j] = MIN;
+				else if (new_position[j] > MAX)
+					new_position[j] = MAX;
 			}
-			swarm[i].position = newPosition;
+			swarm[i].position = new_position;
 
-			//Get Best Error/Position
-			newError = meanSquaredError(trainData, newPosition);
-			swarm[i].error = newError;
-			if (newError < swarm[i].bestError)
+			//Get Error
+			new_error = network->MeanSquaredError(train_data, new_position);
+			swarm[i].error = new_error;
+
+			//Compare with best error
+			if (new_error < swarm[i].best_error)
 			{
-				swarm[i].bestPosition = newPosition;
-				swarm[i].bestError = newError;
+				swarm[i].best_position = new_position;
+				swarm[i].best_error = new_error;
 			}
-			if (newError < bestGlobalError)
+			//Compare with best global error
+			if (new_error < best_global_error)
 			{
-				bestGlobalError = newError;
-				bestGlobalPosition = newPosition;
-			}
-
-			//Use Particle Death Probability And Kill Particles Randomly
-			double die = (double)rand() / RAND_MAX;
-			if (die < deathProbability)
-			{
-				//Get the worst particle
-				int target;
-				double worstError = 0;
-				for (int j = 0; j < particles; j++)
-				{
-					if (worstError < swarm[j].error)
-					{
-						worstError = swarm[j].error;
-						target = i;
-					}
-				}
-
-				//Get 2 random particles
-				int rand1 = std::rand() % particles;
-				int rand2 = std::rand() % particles;
-
-				//Cross over particles position
-				for (int j = 0; j < weightsLen; j++)
-				{
-					if ((int)(std::rand() % 2) == 0)
-						newPosition[j] = swarm[rand1].position[j];
-					else
-						newPosition[j] = swarm[rand2].position[j];
-				}
-
-				//mutate the position random amount
-				int mutationSize = std::rand() % weightsLen;
-				for (int j = 0; j < weightsLen; j++)
-				{
-					if (mutationSize == 0)
-						break;
-					
-					if (int(std::rand() % 2) == 0)
-					{
-						newPosition[j] += (max - min) * ((double)rand() / RAND_MAX) + min;
-						mutationSize--;
-					}
-				}
 				
-				//Update particles position
-				swarm[target].position = newPosition;
+				best_global_position = new_position;
+				best_global_error = new_error;
+			}
+			//Randomly kill particles
+			if (((double)std::rand() / RAND_MAX) < death_probability)
+			{
+				//Reset particle and intilise it again
+				for (int j = 0; j < weights_length; j++)
+				{
+					swarm[i].position[j] = (MAX - MIN) * ((double)std::rand() / RAND_MAX) - MIN;
+				}
+				swarm[i].error = network->MeanSquaredError(train_data, swarm[i].position);
+				swarm[i].best_position = swarm[i].position;
+				swarm[i].best_error = swarm[i].error;
+
+				if (swarm[i].error < best_global_error)
+				{
+					best_global_error = swarm[i].error;
+					best_global_position = swarm[i].position;
+				}
 			}
 		}
 
-		{
-			//Display Progress
-			if (r != 0)
-				std::cout << "\x1b[A";
-			
-			std::cout << "Progress: " << (int)(((double)r / (double)repeat) * 100.0) << "  Error: " << bestGlobalError << std::endl;
-		}
+		//Display Learning Progress
+		if (r > 0)
+			std::cout << "\x1b[A";
+		std::cout << "Progress: " << (int)(((double)r / repeat) * 100.0) << " | Error: " << best_global_error << std::endl;
 
 		r++;
 	}
+    
+	if (auto_assign_best_value)
+		network->SetWeights(best_global_position);
+	else
+		network->SetWeights(current_weights);
 
-	return bestGlobalPosition;
+	return best_global_position;
 }
 
-std::vector<int> Shuffle(std::vector<int> sequence)
+std::vector<int> Learning::ParticleSwarmOptimisation::Shuffle(std::vector<int> sequence)
 {
+    std::vector<int> result = sequence;
 	std::srand(std::time(0));
-	for (unsigned int i = 0; i < sequence.size(); ++i)
+	for (unsigned int i = 0; i < result.size(); ++i)
 	{
-		int r = std::rand() % sequence.size() + i;
-		int tmp = sequence[r];
-		sequence[r] = sequence[i];
-		sequence[i] = tmp;
+		int r = std::rand() % result.size();
+		int tmp = result[r];
+		result[r] = result[i];
+		result[i] = tmp;
 	}
-	return sequence;
+	return result;
 }
