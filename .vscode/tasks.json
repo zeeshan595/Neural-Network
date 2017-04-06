@@ -1,0 +1,29 @@
+{
+    "version": "0.1.0",
+    "isShellCommand": true,
+    "suppressTaskName": true,
+    "showOutput": "always",
+    "command": "",
+    "tasks": [
+        {
+            "taskName": "build",
+            "isBuildCommand": true,
+            "suppressTaskName": true,
+            "echoCommand": true,
+            "args": [
+                "g++ -g -std=c++11 -o Build/build.exe main.cpp"
+            ]
+        },
+        {
+            "taskName": "clean",
+            "isBuildCommand": false,
+            "suppressTaskName": true,
+            "echoCommand": true,
+            "args": [
+                "del /q Build",
+                "& mkdir Build",
+                "& robocopy .SDK/bin Build"
+            ]
+        }
+    ]
+}
