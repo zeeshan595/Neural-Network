@@ -143,8 +143,11 @@ std::vector<double> PSO::Train(
             /*TODO*/
         }
 
+        std::cout << "Trainning: " << repeat_counter << "/" << repeat << ": " << best_global_error << std::endl;
         repeat_counter++;
     }
+
+    return best_global_position;
 }
 
 std::vector<uint32_t> PSO::Shuffle(

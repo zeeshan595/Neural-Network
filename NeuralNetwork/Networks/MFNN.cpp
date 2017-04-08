@@ -97,7 +97,7 @@ double MFNN::ComputeMeanSquaredError(
     std::vector<std::vector<double> >   data,
     std::vector<double>                 weights
 ){
-
+    SetWeights(weights);
 
     uint32_t    input_layer_size    = layers[0]->neurons.size();
     uint32_t    output_layer_size   = layers[layers.size() - 1]->neurons.size();
@@ -122,11 +122,37 @@ double MFNN::ComputeMeanSquaredError(
 void MFNN::SetWeights(
     std::vector<double>     weights
 ){
-    
+    uint32_t k = 0;
+    for (uint32_t i = 0; i < layers.size(); i++)
+    {
+        for (uint32_t j = 0; j < layers[i]->neurons.size(); j++)
+        {
+            layers[i]->neurons[j]->SetBias(weights[k]);
+            k++;
+        }
+        for (uint32_t j = 0; j < layers[i]->synapsis.size(); j++)
+        {
+            layers[i]->synapsis[j]->SetWeight(weights[k]);
+            k++;
+        }
+    }
 }
 std::vector<double> MFNN::GetWeights()
 {
+    std::vector<double> result;
+    for (uint32_t i = 0; i < layers.size(); i++)
+    {
+        for (uint32_t j = 0; j < layers[i]->neurons.size(); j++)
+        {
+            result.push_back(layers[i]->neurons[j]->GetBias());
+        }
+        for (uint32_t j = 0; j < layers[i]->synapsis.size(); j++)
+        {
+            result.push_back(layers[i]->synapsis[j]->GetWeight());
+        }
+    }
 
+    return result;
 }
 
 
