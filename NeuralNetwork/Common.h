@@ -20,11 +20,12 @@
 //CORE
 #include "Core/IrisData.h"
 #include "Core/Activation.h"
-
+#include "Core/CoreFunctions.h"
 
 //STRUCTURE
 #include "Structure/Synapse.h"
 #include "Structure/Neuron.h"
+#include "Structure/BaseNetwork.h"
 
 //NETWORKS
 #include "Networks/MFNN.h"

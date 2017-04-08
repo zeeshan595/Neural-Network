@@ -1,12 +1,10 @@
-std::vector<double> PSO::Train(
+void PSO::Train(
         std::vector<std::vector<double> >   terain_data,
         uint32_t                            particles_count,
         double                              exit_error,
         double                              death_probability,
         uint32_t                            repeat,
-        std::vector<double>                 current_weights,
-        std::vector<double>                 (*compute_function) (std::vector<double>),
-        double                              (*error_function)   (std::vector<std::vector<double> >, std::vector<double>)
+        BaseNetwork*                        base_network
 )
 {
     //Setup
@@ -15,6 +13,7 @@ std::vector<double> PSO::Train(
     double                  inertia_weight          = 0.729;
     double                  cognitive_weight        = 1.49445;
     double                  social_weight           = 1.49445;
+    std::vector<double>     current_weights         = base_network->GetWeights();
     uint32_t                weights_length          = current_weights.size();
     uint32_t                repeat_counter          = 0;
     double                  r1                      = 0; //Random Number 1
@@ -34,7 +33,7 @@ std::vector<double> PSO::Train(
             double high = 0.1 * MAX;
             velocity[j] = (high - low) * ((double)std::rand() / (double)RAND_MAX) + low;
         }
-        double error    = error_function(terain_data, current_weights);
+        double error    = base_network->GetMeanSquaredError(terain_data, current_weights);
         swarm[0]        = Particle();
         swarm[0].position          = current_weights;
         swarm[0].velocity          = velocity;
@@ -58,7 +57,7 @@ std::vector<double> PSO::Train(
             velocity[j] = (high - low) * ((double)std::rand() / (double)RAND_MAX) + low;
             position[j] = (high - low) * ((double)std::rand() / (double)RAND_MAX) + low;
         }
-        double error    = error_function(terain_data, position);
+        double error    = base_network->GetMeanSquaredError(terain_data, position);
         swarm[i]        = Particle();
         swarm[i].position          = position;
         swarm[i].velocity          = velocity;
@@ -122,7 +121,7 @@ std::vector<double> PSO::Train(
             swarm[i].position = new_position;
 
             //Compute Particle error
-            new_error = error_function(terain_data, new_position);
+            new_error = base_network->GetMeanSquaredError(terain_data, new_position);
             swarm[i].error = new_error;
 
             //Compare current error with best particle error
@@ -147,21 +146,5 @@ std::vector<double> PSO::Train(
         repeat_counter++;
     }
 
-    return best_global_position;
-}
-
-std::vector<uint32_t> PSO::Shuffle(
-    std::vector<uint32_t> sequence
-)
-{
-    std::vector<uint32_t> result = sequence;
-	std::srand(std::time(0));
-	for (unsigned int i = 0; i < result.size(); ++i)
-	{
-		int r = std::rand() % result.size();
-		int tmp = result[r];
-		result[r] = result[i];
-		result[i] = tmp;
-	}
-	return result;
+    base_network->SetWeights(best_global_position);
 }

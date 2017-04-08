@@ -1,7 +1,7 @@
 #ifndef _Multilayer_FeedForward_Network
 #define _Multilayer_FeedForward_Network
 
-class MFNN
+class MFNN : public BaseNetwork
 {
 public:
     struct Layer
@@ -19,7 +19,7 @@ public:
         std::vector<double>     inputs
     );
 
-    double ComputeMeanSquaredError(
+    double GetMeanSquaredError(
         std::vector<std::vector<double> >   data,
         std::vector<double>                 weights
     );

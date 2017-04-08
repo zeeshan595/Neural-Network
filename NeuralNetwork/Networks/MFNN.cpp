@@ -93,7 +93,7 @@ std::vector<double> MFNN::Compute(
     return GetOutput();
 }
 
-double MFNN::ComputeMeanSquaredError(
+double MFNN::GetMeanSquaredError(
     std::vector<std::vector<double> >   data,
     std::vector<double>                 weights
 ){
