@@ -6,13 +6,8 @@
 //GENERAL
 #include <algorithm>
 #include <iostream>
-#include <string>
 #include <sstream>
-#include <fstream>
 #include <vector>
-#include <memory>
-#include <list>
-#include <map>
 #include <stdio.h>
 #include <ctime>
 #include <math.h>
@@ -32,3 +27,4 @@
 
 //TRAINNING
 #include "Trainning/PSO.h"
+#include "Trainning/GA.h"

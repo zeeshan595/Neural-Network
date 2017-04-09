@@ -13,7 +13,7 @@ namespace PSO
     };
 
     void Train(
-        std::vector<std::vector<double> >   terain_data,
+        std::vector<std::vector<double> >   train_data,
         uint32_t                            particles_count,
         double                              exit_error,
         double                              death_probability,

@@ -1,5 +1,5 @@
 void PSO::Train(
-        std::vector<std::vector<double> >   terain_data,
+        std::vector<std::vector<double> >   train_data,
         uint32_t                            particles_count,
         double                              exit_error,
         double                              death_probability,
@@ -7,6 +7,14 @@ void PSO::Train(
         BaseNetwork*                        base_network
 )
 {
+    //Error Checking
+    if (particles_count < 1)
+        throw std::runtime_error("ERROR [PSO::Train]: Particle count must be greater than 0");
+    if (repeat < 1)
+        throw std::runtime_error("ERROR [PSO::Train]: Repeat must be greater than 0");
+    if (base_network == NULL || base_network == nullptr)
+        throw std::runtime_error("ERROR [PSO::Train]: BaseNetwork cannot be NULL");
+
     //Setup
     double                  MIN                     =-10.0;
     double                  MAX                     =+10.0;
@@ -27,13 +35,13 @@ void PSO::Train(
     //This ensures we can retrain the already trainned neural network
     {
         std::vector<double> velocity(weights_length);
+        double low  = 0.1 * MIN;
+        double high = 0.1 * MAX;
         for (uint32_t j = 0; j < weights_length; j++)
         {
-            double low  = 0.1 * MIN;
-            double high = 0.1 * MAX;
             velocity[j] = (high - low) * ((double)std::rand() / (double)RAND_MAX) + low;
         }
-        double error    = base_network->GetMeanSquaredError(terain_data, current_weights);
+        double error    = base_network->GetMeanSquaredError(train_data, current_weights);
         swarm[0]        = Particle();
         swarm[0].position          = current_weights;
         swarm[0].velocity          = velocity;
@@ -50,14 +58,14 @@ void PSO::Train(
     {
         std::vector<double> position(weights_length);
         std::vector<double> velocity(weights_length);
+        double low  = 0.1 * MIN;
+        double high = 0.1 * MAX;
         for (uint32_t j = 0; j < weights_length; j++)
         {
-            double low  = 0.1 * MIN;
-            double high = 0.1 * MAX;
             velocity[j] = (high - low) * ((double)std::rand() / (double)RAND_MAX) + low;
             position[j] = (high - low) * ((double)std::rand() / (double)RAND_MAX) + low;
         }
-        double error    = base_network->GetMeanSquaredError(terain_data, position);
+        double error    = base_network->GetMeanSquaredError(train_data, position);
         swarm[i]        = Particle();
         swarm[i].position          = position;
         swarm[i].velocity          = velocity;
@@ -79,6 +87,9 @@ void PSO::Train(
     //Start trainning
     while (repeat_counter < repeat)
     {
+        //Used to measure the duration per epoch
+        clock_t begin = clock();
+
         //Exit if error is too low
         if (best_global_error < exit_error)
             break;
@@ -121,7 +132,7 @@ void PSO::Train(
             swarm[i].position = new_position;
 
             //Compute Particle error
-            new_error = base_network->GetMeanSquaredError(terain_data, new_position);
+            new_error = base_network->GetMeanSquaredError(train_data, new_position);
             swarm[i].error = new_error;
 
             //Compare current error with best particle error
@@ -142,7 +153,10 @@ void PSO::Train(
             /*TODO*/
         }
 
-        std::cout << "Trainning: " << repeat_counter << "/" << repeat << ": " << best_global_error << std::endl;
+        //Used to measure the duration per epoch
+        clock_t end             = clock();
+        double  elapsed_secs    = double(end - begin) / CLOCKS_PER_SEC;
+        std::cout << "Trainning: " << repeat_counter << "/" << repeat << ": " << best_global_error << " - " << elapsed_secs << std::endl;
         repeat_counter++;
     }
 
