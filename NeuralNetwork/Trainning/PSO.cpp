@@ -1,7 +1,6 @@
 void PSO::Train(
         std::vector<std::vector<double> >   train_data,
         uint32_t                            particles_count,
-        double                              exit_error,
         double                              death_probability,
         uint32_t                            repeat,
         BaseNetwork*                        base_network
@@ -88,11 +87,7 @@ void PSO::Train(
     while (repeat_counter < repeat)
     {
         //Used to measure the duration per epoch
-        clock_t begin = clock();
-
-        //Exit if error is too low
-        if (best_global_error < exit_error)
-            break;
+        auto begin = std::chrono::high_resolution_clock::now();
         
         //Rearange the particles in a random order
         sequence = Shuffle(sequence);
@@ -154,9 +149,10 @@ void PSO::Train(
         }
 
         //Used to measure the duration per epoch
-        clock_t end             = clock();
-        double  elapsed_secs    = double(end - begin) / CLOCKS_PER_SEC;
-        std::cout << "Trainning: " << repeat_counter << "/" << repeat << ": " << best_global_error << " - " << elapsed_secs << std::endl;
+        auto elapsed_secs = std::chrono::high_resolution_clock::now() - begin;
+        long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed_secs).count();
+        std::cout << "Trainning: " << repeat_counter << "/" << repeat << ": " << best_global_error << " - " << microseconds << std::endl;
+
         repeat_counter++;
     }
 

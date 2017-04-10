@@ -1,7 +1,7 @@
 void GA::Train(
     std::vector<std::vector<double> >       train_data,
     uint32_t                                population,
-    uint32_t                                mutation_amount,
+    double                                  mutation_amount,
     uint32_t                                generations_amount,
     BaseNetwork*                            base_network
 )
@@ -55,7 +55,8 @@ void GA::Train(
     while (repeat_counter < generations_amount)
     {
         //Used to measure the duration per epoch
-        clock_t begin = clock();
+        auto begin = std::chrono::high_resolution_clock::now();
+
 
         //Re arrange arrays with the best being first
         for (uint32_t i = 0; i < population; i++)
@@ -107,7 +108,7 @@ void GA::Train(
 			for (uint32_t j = 0; j < weights_length; j++)
 			{
                 double m = (high - low) * ((double)std::rand() / (double)RAND_MAX) + low;
-				agents[sequence[i]].dna[j] = agents[sequence[i]].dna[j] + m;
+				agents[sequence[i]].dna[j] = agents[sequence[i]].dna[j] + (m * mutation_amount);
 			}
 		}
 
@@ -122,9 +123,9 @@ void GA::Train(
 		}
 
         //Used to measure the duration per epoch
-        clock_t end             = clock();
-        double  elapsed_secs    = double(end - begin) / CLOCKS_PER_SEC;
-        std::cout << "Trainning " << repeat_counter << "/" << generations_amount << " : " << agents[best_agent].error << " - " << elapsed_secs << std::endl;
+        auto elapsed_secs = std::chrono::high_resolution_clock::now() - begin;
+        long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed_secs).count();
+        std::cout << "Trainning " << repeat_counter << "/" << generations_amount << " : " << agents[best_agent].error << " - " << microseconds << std::endl;
         repeat_counter++;
     }
     base_network->SetWeights(agents[best_agent].dna);

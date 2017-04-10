@@ -2,25 +2,37 @@ Synapse::Synapse()
 {
 
 }
-Synapse::Synapse(Neuron* n)
-{
-    connected_neuron = n;
-}
 
 double      Synapse::GetWeight()
 {
     return synapse_weight;
 }
-Neuron*     Synapse::GetConnectedNeuron()
+double      Synapse::GetWeightDelta()
 {
-    return connected_neuron;
+    return weight_delta;
+}
+Neuron*     Synapse::GetConnectedFromNeuron()
+{
+    return connected_from_neuron;
+}
+Neuron*     Synapse::GetConnectedToNeuron()
+{
+    return connected_to_neuron;
 }
 
 void Synapse::SetWeight(double v)
 {
     synapse_weight = v;
 }
-void Synapse::SetConnectedNeuron(Neuron* n)
+void Synapse::SetWeightDelta(double d)
 {
-    connected_neuron = n;
+    weight_delta = d;
+}
+void Synapse::SetConnectedFromNeuron(Neuron* n)
+{
+    connected_from_neuron = n;
+}
+void Synapse::SetConnectedToNeuron(Neuron* n)
+{
+    connected_to_neuron = n;
 }

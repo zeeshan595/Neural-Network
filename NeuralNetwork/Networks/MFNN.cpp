@@ -47,8 +47,11 @@ MFNN::MFNN(
             for (uint32_t k = 0; k < neurons_per_layer[i]; k++)
             {
                 uint32_t convert_id = (j * neurons_per_layer[i]) + k;
-                layers[i]->synapsis[convert_id]->SetConnectedNeuron(layers[i]->neurons[k]);
-                layers[i+1]->neurons[j]->AddConnectedSynapse(layers[i]->synapsis[convert_id]);
+                layers[i]->synapsis[convert_id]->SetConnectedToNeuron(layers[i+1]->neurons[j]);
+                layers[i]->synapsis[convert_id]->SetConnectedFromNeuron(layers[i]->neurons[k]);
+                
+                layers[i]->neurons[k]->AddConnectedSynapseOut(layers[i]->synapsis[convert_id]);
+                layers[i+1]->neurons[j]->AddConnectedSynapseIn(layers[i]->synapsis[convert_id]);
             }
         }
     }
@@ -105,18 +108,55 @@ double MFNN::GetMeanSquaredError(
 	std::vector<double> tValues(output_layer_size); //Outputs
 
 	double sum_squared_error = 0.0;
-	for (unsigned int i = 0; i < data.size(); ++i)
+	for (uint32_t i = 0; i < data.size(); ++i)
 	{
 		// assumes data has x-values followed by y-values
 		std::copy(data[i].begin(), data[i].begin() + input_layer_size, xValues.begin());
 		std::copy(data[i].begin() + input_layer_size, data[i].begin() + input_layer_size + output_layer_size, tValues.begin());
 
 		std::vector<double> yValues = Compute(xValues);
-		for (unsigned int j = 0; j < yValues.size(); ++j)
+		for (uint32_t j = 0; j < yValues.size(); ++j)
 			sum_squared_error += ((yValues[j] - tValues[j]) * (yValues[j] - tValues[j]));
 	}
 
 	return sum_squared_error;
+}
+double MFNN::GetAccuracy(
+    std::vector<std::vector<double> > data
+){
+    uint32_t    correct             = 0;
+    uint32_t    wrong               = 0;
+    uint32_t    input_layer_size    = layers[0]->neurons.size();
+    uint32_t    output_layer_size   = layers[layers.size() - 1]->neurons.size();
+    std::vector<double> xValues(input_layer_size); // Inputs
+	std::vector<double> tValues(output_layer_size); //Outputs
+    std::vector<double> yValues(output_layer_size);
+
+    for (uint32_t i = 0; i < data.size(); ++i)
+	{
+        std::copy(data[i].begin(), data[i].begin() + input_layer_size, xValues.begin());
+		std::copy(data[i].begin() + input_layer_size, data[i].begin() + input_layer_size + output_layer_size, tValues.begin());
+        yValues = Compute(xValues);
+
+        uint32_t max_computed   = 0;
+        uint32_t max_target     = 0;
+        for (uint32_t j = 0; j < output_layer_size; j++)
+        {
+            if (yValues[max_computed] < yValues[j])
+                max_computed = j;
+        }
+        for (uint32_t j = 0; j < output_layer_size; j++)
+        {
+            if (tValues[max_target] < tValues[j])
+                max_target = j;
+        }
+        if (max_computed == max_target)
+            correct++;
+        else
+            wrong++;
+    }
+
+    return (double)correct / (double)(correct + wrong);
 }
 
 void MFNN::SetWeights(
@@ -186,5 +226,95 @@ void MFNN::SetRandomWeights()
             double rnd = (double)std::rand() / (double)RAND_MAX;
             layers[i]->synapsis[j]->SetWeight(rnd);
         }
+    }
+}
+
+void MFNN::BackPropagationTrain(
+    std::vector<std::vector<double> >       train_data,
+    double                                  learning_rate,
+    double                                  momentum,
+    double                                  weight_decay,
+    uint32_t                                repeat
+){
+    //Error Checking
+    if (train_data.size() <= 0)
+        throw std::runtime_error("ERROR [BackPropagationTrain]: Train data is does not contain any data");
+    if (train_data[0].size() != layers[0]->neurons.size() + layers[layers.size() - 1]->neurons.size())
+        throw std::runtime_error("ERROR [BackPropagationTrain]: train data size does not match the neural network");
+    if (momentum <= 0)
+        throw std::runtime_error("ERROR [BackPropagationTrain]: momentum must be greater then 0");
+    
+    //Setup
+    uint32_t                                repeat_counter                      = 0;
+    uint32_t                                input_layer_size                    = layers[0]->neurons.size();
+    uint32_t                                output_layer_size                   = layers[layers.size() - 1]->neurons.size();
+
+    while (repeat_counter < repeat)
+    {
+        for (uint32_t d = 0; d < train_data.size(); d++)
+        {
+            std::vector<double> xValues(input_layer_size); // Inputs
+            std::vector<double> tValues(output_layer_size); //Outputs
+            std::copy(train_data[d].begin(), train_data[d].begin() + input_layer_size, xValues.begin());
+            std::copy(train_data[d].begin() + input_layer_size, train_data[d].begin() + input_layer_size + output_layer_size, tValues.begin());
+            std::vector<double> yValues = Compute(xValues);
+
+            //Compute gradiant for each neuron
+            for (uint32_t i = layers.size() - 1; i > 0; i--)
+            {
+                for (uint32_t j = 0; j < layers[i]->neurons.size(); j++)
+                {
+                    double derivative   = Activation::ApplyDerivative({ layers[i]->neurons[j]->GetValue() }, layers[i]->neurons[j]->GetActivationType())[0];
+                    double sum          = 0.0;
+                    if (i == layers.size() - 1) //If Output layer
+                    {
+                        sum = (tValues[j] - yValues[j]);
+                    }
+                    else //Else other layer
+                    {
+                        for (uint32_t k = 0; k < layers[i + 1]->neurons.size(); k++)
+                        {
+                            uint32_t convert_id = (k * layers[i]->neurons.size()) + j;
+                            double x = layers[i + 1]->neurons[k]->GetGradient() * layers[i]->synapsis[convert_id]->GetWeight();
+                            sum += x;
+                        }
+                    }
+                    layers[i]->neurons[j]->SetGradient(derivative * sum);
+                }
+            }
+
+            //Update Weights
+            for (uint32_t i = 0; i < layers.size() - 1; i++)
+            {
+                for (uint32_t j = 0; j < layers[i]->synapsis.size(); j++)
+                {
+                    double delta    = learning_rate * layers[i]->synapsis[j]->GetConnectedToNeuron()->GetGradient() * layers[i]->synapsis[j]->GetConnectedFromNeuron()->GetValue();
+                    double weight   = layers[i]->synapsis[j]->GetWeight();
+                    weight         += delta;
+                    weight         += momentum * layers[i]->synapsis[j]->GetWeightDelta();
+                    weight         -= (weight_decay * weight);
+                    layers[i]->synapsis[j]->SetWeight(weight);
+                    layers[i]->synapsis[j]->SetWeightDelta(delta);
+                }
+            }
+
+            //Update Biases
+            for (uint32_t i = 1; i < layers.size(); i++)
+            {
+                for (uint32_t j = 0; j < layers[i]->neurons.size(); j++)
+                {
+                    double delta    = learning_rate * layers[i]->neurons[j]->GetGradient() * 1.0;
+                    double bias     = layers[i]->neurons[j]->GetBias();
+                    bias           += delta;
+                    bias           += momentum * layers[i]->neurons[j]->GetBiasDelta();
+                    bias           -= (weight_decay * bias);
+                    layers[i]->neurons[j]->SetBias(bias);
+                    layers[i]->neurons[j]->SetBiasDelta(delta);
+                }
+            }
+        }
+
+        std::cout << "Trainning " << repeat_counter << "/" << repeat << " : " << GetMeanSquaredError(train_data, GetWeights()) << std::endl;
+        repeat_counter++;
     }
 }
