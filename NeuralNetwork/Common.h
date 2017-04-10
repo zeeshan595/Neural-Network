@@ -12,9 +12,9 @@
 #include <ctime>
 #include <math.h>
 #include <chrono>
+#include <iomanip> 
 
 //CORE
-#include "Core/IrisData.h"
 #include "Core/Activation.h"
 #include "Core/CoreFunctions.h"
 
@@ -29,3 +29,8 @@
 //TRAINNING
 #include "Trainning/PSO.h"
 #include "Trainning/GA.h"
+
+//DATA SETS
+#include "DataSets/Iris.h"
+#include "DataSets/Wine.h"
+#include "DataSets/Car.h"

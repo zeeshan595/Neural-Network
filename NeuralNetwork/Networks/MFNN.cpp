@@ -100,10 +100,17 @@ double MFNN::GetMeanSquaredError(
     std::vector<std::vector<double> >   data,
     std::vector<double>                 weights
 ){
-    SetWeights(weights);
+    //Error Checking
+    if (data.size() <= 0)
+        throw std::runtime_error("ERROR [GetMeanSquaredError]: could not locate data.");
 
     uint32_t    input_layer_size    = layers[0]->neurons.size();
     uint32_t    output_layer_size   = layers[layers.size() - 1]->neurons.size();
+    if (data[0].size() != input_layer_size + output_layer_size)
+        throw std::runtime_error("ERROR [GetMeanSquaredError]: trainning data does not match neural network");
+
+    SetWeights(weights);
+
     std::vector<double> xValues(input_layer_size); // Inputs
 	std::vector<double> tValues(output_layer_size); //Outputs
 

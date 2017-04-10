@@ -28,6 +28,7 @@
         "typeinfo": "cpp",
         "utility": "cpp",
         "chrono": "cpp",
-        "ratio": "cpp"
+        "ratio": "cpp",
+        "iomanip": "cpp"
     }
 }
