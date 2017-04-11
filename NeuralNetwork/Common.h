@@ -34,3 +34,4 @@
 #include "DataSets/Iris.h"
 #include "DataSets/Wine.h"
 #include "DataSets/Car.h"
+#include "DataSets/BreastCancer.h"

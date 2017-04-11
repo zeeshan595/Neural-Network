@@ -20,7 +20,7 @@ void PrintDataSet(std::vector<std::vector<double> > dataset, uint32_t tab)
 	for (uint32_t i = 0; i < dataset.size(); i++)
     {
         std::cout << "{ ";
-        for (uint32_t j = 0; j < dataset.size(); j++)
+        for (uint32_t j = 0; j < dataset[i].size(); j++)
         {
             std::cout << std::setw(tab) << dataset[i][j] << ", ";
         }
@@ -28,10 +28,11 @@ void PrintDataSet(std::vector<std::vector<double> > dataset, uint32_t tab)
     }
 }
 
-std::vector<std::vector<double> > Normalize(std::vector<std::vector<double> > train_data, uint32_t cols)
+void Normalize(std::vector<std::vector<double> > &train_data, std::vector<uint32_t> cols)
 {
-    for (uint32_t i = 0; i < cols; i++)
+    for (uint32_t col = 0; col < cols.size(); col++)
     {
+        uint32_t i = cols[col];
         double sum = 0.0;
         for (int j = 0; j < train_data.size(); j++)
             sum += train_data[j][i];
@@ -47,8 +48,6 @@ std::vector<std::vector<double> > Normalize(std::vector<std::vector<double> > tr
         for (int j = 0; j < train_data.size(); j++)
             train_data[j][i] = (train_data[j][i] - mean) / sd;
     }
-
-    return train_data;
 }
 
 #endif

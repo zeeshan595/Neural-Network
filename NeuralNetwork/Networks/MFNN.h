@@ -39,7 +39,7 @@ public:
 
     void SetRandomWeights();
 
-    void BackPropagationTrain(
+    void TrainUsingBP(
         std::vector<std::vector<double> >       train_data,
         double                                  learning_rate,
         double                                  momentum,

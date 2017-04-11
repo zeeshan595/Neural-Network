@@ -236,7 +236,7 @@ void MFNN::SetRandomWeights()
     }
 }
 
-void MFNN::BackPropagationTrain(
+void MFNN::TrainUsingBP(
     std::vector<std::vector<double> >       train_data,
     double                                  learning_rate,
     double                                  momentum,

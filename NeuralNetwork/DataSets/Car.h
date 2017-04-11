@@ -1,6 +1,26 @@
 #ifndef _CAR_DATASET
 #define _CAR_DATASET
 
+/*
+   buying       v-high, high, med, low
+   maint        v-high, high, med, low
+   doors        2, 3, 4, 5-more
+   persons      2, 4, more
+   lug_boot     small, med, big
+   safety       low, med, high
+   class        unacc, acc, good, v-good
+
+     class      N          N[%]
+   -----------------------------
+   unacc     1210     (70.023 %) 
+   acc        384     (22.222 %) 
+   good        69     ( 3.993 %) 
+   v-good      65     ( 3.762 %)
+
+   INPUTS   = 7
+   OUTPUTS  = 4
+*/
+
 namespace CarData
 {
     std::vector<std::vector<double> > dataset
