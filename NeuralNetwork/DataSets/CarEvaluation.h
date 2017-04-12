@@ -17,11 +17,11 @@
    good        69     ( 3.993 %) 
    v-good      65     ( 3.762 %)
 
-   INPUTS   = 7
+   INPUTS   = 21
    OUTPUTS  = 4
 */
 
-namespace CarData
+namespace CarEvaluationData
 {
     std::vector<std::vector<double> > dataset
     {

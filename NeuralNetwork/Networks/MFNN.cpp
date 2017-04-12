@@ -258,6 +258,8 @@ void MFNN::TrainUsingBP(
 
     while (repeat_counter < repeat)
     {
+        //Used to measure the duration per epoch
+        auto begin = std::chrono::high_resolution_clock::now();
         for (uint32_t d = 0; d < train_data.size(); d++)
         {
             std::vector<double> xValues(input_layer_size); // Inputs
@@ -321,7 +323,10 @@ void MFNN::TrainUsingBP(
             }
         }
 
-        std::cout << "Trainning " << repeat_counter << "/" << repeat << " : " << GetMeanSquaredError(train_data, GetWeights()) << std::endl;
+        //Used to measure the duration per epoch
+        auto elapsed_secs = std::chrono::high_resolution_clock::now() - begin;
+        long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed_secs).count();
+        std::cout << repeat_counter << " " << GetMeanSquaredError(train_data, GetWeights()) << " " << microseconds << std::endl;
         repeat_counter++;
     }
 }

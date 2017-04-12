@@ -125,7 +125,7 @@ void GA::Train(
         //Used to measure the duration per epoch
         auto elapsed_secs = std::chrono::high_resolution_clock::now() - begin;
         long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed_secs).count();
-        std::cout << "Trainning " << repeat_counter << "/" << generations_amount << " : " << agents[best_agent].error << " - " << microseconds << std::endl;
+        std::cout << repeat_counter << " " << agents[best_agent].error << " " << microseconds << std::endl;
         repeat_counter++;
     }
     base_network->SetWeights(agents[best_agent].dna);
