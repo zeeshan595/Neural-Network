@@ -14,6 +14,11 @@ public:
         return 100.0;
     }
 
+    virtual double GetAccuracy(std::vector<std::vector<double> > data)
+    {
+        
+    }
+
     virtual void SetWeights(std::vector<double> weights)
     {
 

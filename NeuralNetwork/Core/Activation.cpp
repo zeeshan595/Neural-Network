@@ -42,14 +42,19 @@ std::vector<double> Activation::ApplyDerivative(
 std::vector<double> Activation::LogisticSigmoid(
     std::vector<double> v
 ){
+    //An array of numbers used to store results in.
     std::vector<double> result;
+    //Resize the array to match the parameter supplied by the user.
     result.resize(v.size());
+    //go through each number provided by the parameter
     for (uint32_t i = 0; i < v.size(); i++)
     {
+        //Apply the logistic sigmoid function to each number
+        //and store it in result array.
         result[i] = 1.0 / (1.0 + exp(-v[i]));
     }
+    //return the result array.
     return result;
-    
 }
 std::vector<double> Activation::HyperbolicTangent(
     std::vector<double> v

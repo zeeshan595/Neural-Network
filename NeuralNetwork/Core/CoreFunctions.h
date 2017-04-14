@@ -50,4 +50,25 @@ void Normalize(std::vector<std::vector<double> > &train_data, std::vector<uint32
     }
 }
 
+void RandomizeDataSetOrder(std::vector<std::vector<double> > &train_data)
+{
+    //Use shuffle function to create a randomly ordered index for
+    //the training data.
+    std::vector<uint32_t> sequence(train_data.size());
+    for (uint32_t i = 0; i < train_data.size(); i++)
+        sequence[i] = i;
+    sequence = Shuffle(sequence);
+
+    //Use the randomly created index to store randomly ordered train data
+    //into new_train_data variable
+    std::vector<std::vector<double> > new_train_data(train_data.size());
+    for (uint32_t i = 0; i < train_data.size(); i++)
+    {
+        new_train_data[i] = train_data[sequence[i]];
+    }
+
+    //Update the training data.
+    train_data = new_train_data;
+}
+
 #endif

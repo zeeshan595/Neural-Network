@@ -30,12 +30,20 @@ std::vector<Synapse*>*          Neuron::GetConnectedSynapsisOut()
 
 void Neuron::ComputeValue()
 {
+    //Sets the current value to zero.
     neuron_value = 0;
+    //Goes through each synapse connected to this neuron that
+    //is feeding into this neuron.
     for (uint32_t i = 0; i < synapsis_in.size(); i++)
     {
+        //The weight of the synapse and the value of the node that synapse
+        //is coming out from are multiplied then added to the value of this
+        //neuron
         neuron_value += synapsis_in[i]->GetWeight() * synapsis_in[i]->GetConnectedFromNeuron()->GetValue();
     }
+    //The bias value is added to the neuron value.
     neuron_value += bias_value;
+    //An activation method is applied to this neuron
     neuron_value = Activation::ApplyFunction({ neuron_value }, activation_type)[0];
 }
 void Neuron::SetValue(double v)

@@ -6,7 +6,9 @@ class MFNN : public BaseNetwork
 public:
     struct Layer
     {
+        //list of neurons in a layer
         std::vector<Neuron*>    neurons;
+        //list of synapsis in a layer
         std::vector<Synapse*>   synapsis;
     };
 
@@ -48,6 +50,7 @@ public:
     );
 
 protected:
+    //list of layers
     std::vector<Layer*>         layers;
 };
 

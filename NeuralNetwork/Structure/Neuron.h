@@ -28,12 +28,21 @@ public:
     void AddConnectedSynapseOut(Synapse* synapse);
 
 private:
+    //stores the current neuron value
     double                              neuron_value            = 0;
+    //stores the current neuron gradient (used by BP).
     double                              neuron_gradient         = 0;
+    //stores the bias value that will be applied to this neuron
     double                              bias_value              = 0;
+    //stores the bias delta for this neuron (used by BP)
     double                              bias_delta              = 0;
+    //Stores the activation function that will be applied in this neuron
     Activation::ActivationType          activation_type         = Activation::ActivationType::LOGISTIC_SIGMOID;
+    //Stores a list of pointers. These pointers point to all the synapsis going
+    //into this neuron
     std::vector<Synapse*>               synapsis_in;
+    //Stores a list of pointers. These pointers point to all the synapsis coming
+    //out of neuron
     std::vector<Synapse*>               synapsis_out;
 };
 

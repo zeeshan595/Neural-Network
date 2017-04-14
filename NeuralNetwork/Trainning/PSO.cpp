@@ -1,33 +1,51 @@
 void PSO::Train(
+        //training data 
         std::vector<std::vector<double> >   train_data,
+        //amount of particles to use for training
         uint32_t                            particles_count,
-        double                              death_probability,
+        //max epochs this training should be repeated for
         uint32_t                            repeat,
+        //A pointer to the neural network that
+        //needs to be trained.
         BaseNetwork*                        base_network
 )
 {
     //Error Checking
+    //There cannot be less than 1 particle
     if (particles_count < 1)
         throw std::runtime_error("ERROR [PSO::Train]: Particle count must be greater than 0");
+    //max epochs cannot be smaller then 1
     if (repeat < 1)
         throw std::runtime_error("ERROR [PSO::Train]: Repeat must be greater than 0");
+    //The pointer to the neural network cannot be equal to NULL
     if (base_network == NULL || base_network == nullptr)
         throw std::runtime_error("ERROR [PSO::Train]: BaseNetwork cannot be NULL");
+    //Make sure the training data does not equal NULL
+    if (train_data.size() <= 0)
+        throw std::runtime_error("ERROR [PSO::Train]: Train data is does not contain any data");
 
-    //Setup
+
+    //Setup min and max position for particles
     double                  MIN                     =-10.0;
     double                  MAX                     =+10.0;
+    //Setup free parameters
     double                  inertia_weight          = 0.729;
     double                  cognitive_weight        = 1.49445;
     double                  social_weight           = 1.49445;
+    //Store current weights and current weight length in a variable
     std::vector<double>     current_weights         = base_network->GetWeights();
     uint32_t                weights_length          = current_weights.size();
+    //setup epoch counter
     uint32_t                repeat_counter          = 0;
+    //Setup variables to be used as random number generators
     double                  r1                      = 0; //Random Number 1
     double                  r2                      = 0; //Random Number 2
+    //Setup global variables (best global position, best global error)
     double                  best_global_error       = std::numeric_limits<double>::max();
     std::vector<double>     best_global_position(weights_length);
+    //create a sequence variable for randomizing which particle is processed first.
     std::vector<uint32_t>   sequence(particles_count);
+    //create a swarm of particles.
     std::vector<Particle>   swarm(particles_count);
 
     //Set 1st particle's position to current weights
@@ -55,16 +73,22 @@ void PSO::Train(
     //Setup all particles
     for (uint32_t i = 1; i < particles_count; i++)
     {
+        //Change the size of position and velocity to match weights
         std::vector<double> position(weights_length);
         std::vector<double> velocity(weights_length);
+        //Use min and max to create a low and high number for the
+        //number generator
         double low  = 0.1 * MIN;
         double high = 0.1 * MAX;
         for (uint32_t j = 0; j < weights_length; j++)
         {
+            //Use random numbers to compute a velocity and position
             velocity[j] = (high - low) * ((double)std::rand() / (double)RAND_MAX) + low;
             position[j] = (high - low) * ((double)std::rand() / (double)RAND_MAX) + low;
         }
+        //Check the error of the current particle
         double error    = base_network->GetMeanSquaredError(train_data, position);
+        //Initialise the particle & set all the variables
         swarm[i]        = Particle();
         swarm[i].position          = position;
         swarm[i].velocity          = velocity;
@@ -72,8 +96,11 @@ void PSO::Train(
         swarm[i].error             = error;
         swarm[i].best_error        = error;
 
+        //If the particles best error is smaller then best global error
         if (swarm[i].best_error < best_global_error)
         {
+            //Then replace the best global position and error with
+            //the particles bbest position and error
             best_global_position    = position;
             best_global_error       = swarm[i].best_error;
         }
@@ -92,7 +119,8 @@ void PSO::Train(
         //Rearange the particles in a random order
         sequence = Shuffle(sequence);
 
-        //Setup
+        //Create new varibles where the newly computed particle's
+        //position, velocity and error will be stored
         std::vector<double>     new_position(weights_length);
         std::vector<double>     new_velocity(weights_length);
         double                  new_error;
@@ -119,6 +147,7 @@ void PSO::Train(
             {
                 new_position[j] = swarm[i].position[j] + new_velocity[j];
                 //Make sure particle does not go out of bounds.
+                //using MIN and MAX variables
                 if (new_position[j] < MIN)
                     new_position[j] = MIN;
                 else if (new_position[j] > MAX)
@@ -143,15 +172,15 @@ void PSO::Train(
                 best_global_error       = new_error;
                 best_global_position    = new_position;
             }
-
-            //Kill Particles Randomly
-            /*TODO*/
         }
 
-        //Used to measure the duration per epoch
+        //get current time and subtract it from the time noted in "begin" variable
         auto elapsed_secs = std::chrono::high_resolution_clock::now() - begin;
+        //Convert time to microseconds
         long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed_secs).count();
-        std::cout << repeat_counter << " " << best_global_error << " " << microseconds << std::endl;
+        //Output text to the console.
+        base_network->SetWeights(best_global_position);
+        std::cout << repeat_counter << "," << best_global_error << "," << base_network->GetAccuracy(train_data) << "," << microseconds << std::endl;
 
         repeat_counter++;
     }

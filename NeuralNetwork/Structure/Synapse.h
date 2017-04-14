@@ -20,9 +20,13 @@ public:
     void SetConnectedToNeuron(Neuron* n);
 
 private:
+    //Stores the current weight of this synapse
     double              synapse_weight          = 0;
+    //Stores the derivative error of this synapse
     double              weight_delta            = 0;
+    //Stores a pointer a neuron to which this neuron is coming out from.
     Neuron*             connected_from_neuron   = NULL;
+    //Stores a pointer a neuron to which this synapse is going into
     Neuron*             connected_to_neuron     = NULL;
 };
 
