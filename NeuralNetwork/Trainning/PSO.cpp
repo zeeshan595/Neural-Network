@@ -180,7 +180,7 @@ void PSO::Train(
         long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed_secs).count();
         //Output text to the console.
         base_network->SetWeights(best_global_position);
-        std::cout << repeat_counter << "," << best_global_error << "," << base_network->GetAccuracy(train_data) << "," << microseconds << std::endl;
+        std::cout << "epoch: " << repeat_counter << ", accuracy:" << base_network->GetAccuracy(train_data) << std::endl;
 
         repeat_counter++;
     }

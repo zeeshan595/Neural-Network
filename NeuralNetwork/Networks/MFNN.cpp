@@ -390,7 +390,7 @@ void MFNN::TrainUsingBP(
         //Convert time to microseconds
         long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed_secs).count();
         //Output text to the console.
-        std::cout << repeat_counter << "," << GetMeanSquaredError(train_data, GetWeights()) << "," << GetAccuracy(train_data) << "," << microseconds << std::endl;
+        std::cout << "epoch: " << repeat_counter << ", accuracy:" << GetAccuracy(train_data) << std::endl;
         //Go to next epoch
         repeat_counter++;
     }
