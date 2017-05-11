@@ -150,14 +150,22 @@ double MFNN::GetMeanSquaredError(
 double MFNN::GetAccuracy(
     std::vector<std::vector<double> > data
 ){
+    //Error Checking
+    if (data.size() <= 0)
+        throw std::runtime_error("ERROR [GetAccuracy]: could not locate data.");
+
+    //Get the size of input & output layer to ensure data matches it.
+    uint32_t    input_layer_size    = layers[0]->neurons.size();
+    uint32_t    output_layer_size   = layers[layers.size() - 1]->neurons.size();
+    if (data[0].size() != input_layer_size + output_layer_size)
+        throw std::runtime_error("ERROR [GetAccuracy]: trainning data does not match neural network");
+
     //create 2 variables that will be used to determain if the value
     //computed is accurate.
     uint32_t    correct             = 0;
     uint32_t    wrong               = 0;
-    //Get the size of output & input layers and store them in a variable
-    //for ease of access
-    uint32_t    input_layer_size    = layers[0]->neurons.size();
-    uint32_t    output_layer_size   = layers[layers.size() - 1]->neurons.size();
+
+
     //Setup variables that will store the input, computed output and desired output
     std::vector<double> xValues(input_layer_size); // Inputs
 	std::vector<double> tValues(output_layer_size); //Outputs
